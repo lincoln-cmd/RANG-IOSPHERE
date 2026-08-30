@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const sectors = [
+  { id: 'log', index: '01', label: '관측일지', en: 'Observation Log', x: 23, y: 36, note: '밤하늘에서 직접 얻은 기록' },
+  { id: 'gear', index: '02', label: '장비와 사용법', en: 'Equipment', x: 42, y: 23, note: '망원경의 구조와 운용' },
+  { id: 'theory', index: '03', label: '관측 이론', en: 'Field Theory', x: 58, y: 43, note: '관측을 이해하는 데 필요한 이론' },
+  { id: 'simulation', index: '04', label: '시뮬레이션', en: 'Simulation', x: 72, y: 27, note: '예측값과 실제 관측의 비교' },
+  { id: 'data', index: '05', label: '오픈데이터', en: 'Open Data', x: 80, y: 61, note: '공개 천문 데이터 탐구' },
+];
+---
+
+<BaseLayout>
+  <main>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="랑이오스페어 홈">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span><strong>랑이오스페어</strong><small>LANG-IOSPHERE</small></span>
+      </a>
+      <nav aria-label="주요 메뉴">
+        <a href="#observatory">관측소</a>
+        <a href="#archive">아카이브</a>
+        <a href="#about">프로젝트</a>
+      </nav>
+      <span class="status"><i></i> OBSERVATORY ONLINE</span>
+    </header>
+
+    <section class="hero" id="observatory">
+      <div class="hero-copy">
+        <p class="eyebrow">A PERSONAL NIGHT-SKY ARCHIVE · WITH LANG</p>
+        <h1>랑과 함께 보는<br /><em>밤하늘 기록.</em></h1>
+        <p class="intro">망원경으로 직접 본 밤하늘과 그날의 관측 조건, 장비 사용기, 궁금해서 찾아본 이론과 데이터를 차곡차곡 모으는 개인 취미 아카이브입니다.</p>
+        <a class="primary-action" href="#archive">기록 둘러보기 <span>↘</span></a>
+      </div>
+
+      <div class="sky-map" aria-label="랑이오스페어 관측 영역 지도">
+        <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+        <svg class="connections" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M23 36 L42 23 L58 43 L72 27 L80 61" />
+        </svg>
+        {sectors.map((sector) => (
+          <a class="star-node" href={`#${sector.id}`} style={`--x:${sector.x}%;--y:${sector.y}%`} aria-label={`${sector.label}: ${sector.note}`}>
+            <span class="star"></span><span class="star-label">{sector.index} · {sector.label}</span>
+          </a>
+        ))}
+        <div class="coordinate top-left">AZ 000°</div><div class="coordinate bottom-right">ALT +37°</div>
+        <div class="reticle"><span></span></div>
+      </div>
+      <p class="scroll-cue">SCROLL TO EXPLORE <span>↓</span></p>
+    </section>
+
+    <section class="archive" id="archive">
+      <div class="section-heading">
+        <p class="eyebrow">OBSERVATION SECTORS</p>
+        <h2>다섯 개의 관측 영역</h2>
+        <p>별을 선택하듯 기록과 탐구 사이를 이동합니다.</p>
+      </div>
+      <div class="sector-grid">
+        {sectors.map((sector) => (
+          <article class="sector-card" id={sector.id}>
+            <div><span>{sector.index}</span><small>{sector.en}</small></div>
+            <h3>{sector.label}</h3>
+            <p>{sector.note}</p>
+            <a href="#" aria-label={`${sector.label} 준비 중`}>ARCHIVE SOON <span>↗</span></a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="first-record" id="about">
+      <div>
+        <p class="eyebrow">FIRST FIELD NOTE · PREPARING</p>
+        <h2>망원경은 어떻게<br />빛을 모으는가</h2>
+      </div>
+      <p>첫 기록에서는 굴절식·반사식·복합식 망원경의 구조와 광경로, 실제 작동 방식의 차이를 탐구합니다.</p>
+      <span class="record-number">0001</span>
+    </section>
+
+    <footer><span>© 2026 LANG-IOSPHERE</span><span>관측소장 랑 · 기록자 김동훈</span><a href="https://github.com/lincoln-cmd/LANG-IOSPHERE">GITHUB ↗</a></footer>
+  </main>
+</BaseLayout>
