@@ -45,7 +45,7 @@ for (const file of files) {
   const published = data.draft === false;
   const slug = relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '');
 
-  if (!/^[a-z0-9]+(?:[/-][a-z0-9]+)*$/.test(slug)) report('error', file, '파일명은 영문 소문자·숫자·하이픈만 사용하세요.');
+  if (!/^[\p{L}\p{N}]+(?:[/-][\p{L}\p{N}]+)*$/u.test(slug)) report('error', file, '파일명은 문자·숫자·하이픈만 사용하세요.');
   for (const field of ['title', 'description', 'category']) if (typeof data[field] !== 'string' || !data[field].trim()) report('error', file, `${field} 값이 비어 있습니다.`);
   if (!validCategories.has(data.category)) report('error', file, `지원하지 않는 category입니다: ${data.category}`);
   if (!Array.isArray(data.tags)) report('error', file, 'tags는 YAML 배열이어야 합니다.');
