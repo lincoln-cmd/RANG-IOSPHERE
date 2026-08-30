@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { byPublishedDate, categories, formatDate, type PostEntry } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
+  return posts.map((post, index) => {
+    const related = posts.filter((candidate) => candidate.id !== post.id && (candidate.data.category === post.data.category || candidate.data.tags.some((tag) => post.data.tags.includes(tag)))).slice(0, 3);
+    return { params: { id: post.id }, props: { post, previous: posts[index + 1], next: posts[index - 1], related } };
+  });
+}
+
+interface Props { post: PostEntry; previous?: PostEntry; next?: PostEntry; related: PostEntry[] }
+const { post, previous, next, related } = Astro.props;
+const { Content, headings } = await render(post);
+const category = categories[post.data.category];
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+<BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null}>
+  <SiteHeader compact />
+  <main class="article-page">
+    <header class="article-hero">
+      <a href="/archive/" class="back-link">← ARCHIVE</a>
+      <p class="eyebrow">{category.index} · {category.en}</p>
+      <h1>{post.data.title}</h1>
+      <p>{post.data.description}</p>
+      <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span></div>
+      <div class="article-tags">{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+    </header>
+
+    <div class="article-shell">
+      <aside class="article-toc" aria-label="글 목차">
+        <p>CONTENTS</p>
+        {toc.length ? <ol>{toc.map((heading) => <li class:list={{ nested: heading.depth === 3 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol> : <span>목차가 없습니다.</span>}
+      </aside>
+      <article class="prose"><Content /></article>
+    </div>
+
+    <nav class="post-navigation" aria-label="이전 글과 다음 글">
+      {previous ? <a href={`/archive/${previous.id}/`}><small>PREVIOUS</small><strong>{previous.data.title}</strong></a> : <span></span>}
+      {next ? <a href={`/archive/${next.id}/`}><small>NEXT</small><strong>{next.data.title}</strong></a> : <span></span>}
+    </nav>
+
+    {related.length > 0 && <section class="related-posts"><p class="eyebrow">RELATED RECORDS</p><h2>함께 읽을 기록</h2><div>{related.map((entry) => <a href={`/archive/${entry.id}/`}><span>{categories[entry.data.category].label}</span><strong>{entry.data.title}</strong><p>{entry.data.description}</p></a>)}</div></section>}
+  </main>
+  <SiteFooter />
+</BaseLayout>

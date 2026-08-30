@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 const sectors = [
   { id: 'log', index: '01', label: '관측일지', en: 'Observation Log', x: 23, y: 36, note: '밤하늘에서 직접 얻은 기록' },
@@ -12,18 +14,7 @@ const sectors = [
 
 <BaseLayout>
   <main>
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="랑이오스페어 홈">
-        <span class="brand-mark" aria-hidden="true">R</span>
-        <span><strong>랑이오스페어</strong><small>RANG-IOSPHERE</small></span>
-      </a>
-      <nav aria-label="주요 메뉴">
-        <a href="#observatory">관측소</a>
-        <a href="#archive">아카이브</a>
-        <a href="#about">프로젝트</a>
-      </nav>
-      <span class="status"><i></i> OBSERVATORY ONLINE</span>
-    </header>
+    <SiteHeader />
 
     <section class="hero" id="observatory">
       <div class="hero-copy">
@@ -61,7 +52,7 @@ const sectors = [
             <div><span>{sector.index}</span><small>{sector.en}</small></div>
             <h3>{sector.label}</h3>
             <p>{sector.note}</p>
-            <a href="#" aria-label={`${sector.label} 준비 중`}>ARCHIVE SOON <span>↗</span></a>
+            <a href={`/archive/#${sector.id === 'log' ? 'observation' : sector.id === 'gear' ? 'equipment' : sector.id === 'data' ? 'open-data' : sector.id}`} aria-label={`${sector.label} 아카이브 보기`}>OPEN ARCHIVE <span>↗</span></a>
           </article>
         ))}
       </div>
@@ -76,6 +67,6 @@ const sectors = [
       <span class="record-number">0001</span>
     </section>
 
-    <footer><span>© 2026 RANG-IOSPHERE</span><span>관측소장 랑이 · 기록자 김동훈</span><a href="https://github.com/lincoln-cmd/RANG-IOSPHERE">GITHUB ↗</a></footer>
+    <SiteFooter />
   </main>
 </BaseLayout>

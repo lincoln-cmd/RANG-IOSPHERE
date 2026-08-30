@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { byPublishedDate, categories, formatDate } from '../../lib/content';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
+---
+<BaseLayout title="아카이브 | 랑이오스페어" description="랑이오스페어의 관측일지와 천체관측 탐구 기록">
+  <SiteHeader compact />
+  <main class="archive-page">
+    <header class="archive-intro">
+      <p class="eyebrow">FIELD NOTES & RESEARCH ARCHIVE</p>
+      <h1>관측과 탐구의 기록</h1>
+      <p>직접 관측하고 공부한 내용을 다섯 영역으로 나누어 정리합니다. 초안은 공개하지 않으며, 확인을 마친 기록만 이곳에 표시됩니다.</p>
+      <dl><div><dt>PUBLIC RECORDS</dt><dd>{String(posts.length).padStart(2, '0')}</dd></div><div><dt>SECTORS</dt><dd>05</dd></div><div><dt>STATUS</dt><dd>BUILDING</dd></div></dl>
+    </header>
+
+    <nav class="archive-index" aria-label="아카이브 분류">
+      {Object.entries(categories).map(([key, category]) => (
+        <a href={`#${key}`}><span>{category.index}</span>{category.label}<small>{category.en}</small></a>
+      ))}
+    </nav>
+
+    <div class="archive-sections">
+      {Object.entries(categories).map(([key, category]) => {
+        const categoryPosts = posts.filter((post) => post.data.category === key);
+        return (
+          <section class="archive-group" id={key}>
+            <header><span>{category.index}</span><div><p>{category.en}</p><h2>{category.label}</h2></div><strong>{String(categoryPosts.length).padStart(2, '0')}</strong></header>
+            {categoryPosts.length ? (
+              <div class="post-list">
+                {categoryPosts.map((post) => (
+                  <article>
+                    <p>{formatDate(post.data.publishedAt)}</p>
+                    <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
+                    <p>{post.data.description}</p>
+                    <div>{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+                    <a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 읽기`}>READ NOTE ↗</a>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div class="empty-record"><span aria-hidden="true">＋</span><div><strong>아직 공개된 기록이 없습니다.</strong><p>직접 관측하고 공부한 내용을 정리한 뒤 첫 기록을 공개할 예정입니다.</p></div></div>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

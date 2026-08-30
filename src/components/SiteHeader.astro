@@ -1,0 +1,15 @@
+---
+const { compact = false } = Astro.props;
+---
+<header class:list={['site-header', { compact }]}>
+  <a class="brand" href="/" aria-label="랑이오스페어 홈">
+    <span class="brand-mark" aria-hidden="true">R</span>
+    <span><strong>랑이오스페어</strong><small>RANG-IOSPHERE</small></span>
+  </a>
+  <nav aria-label="주요 메뉴">
+    <a href="/#observatory">관측소</a>
+    <a href="/archive/">아카이브</a>
+    <a href="/#about">프로젝트</a>
+  </nav>
+  <span class="status"><i></i> OBSERVATORY ONLINE</span>
+</header>

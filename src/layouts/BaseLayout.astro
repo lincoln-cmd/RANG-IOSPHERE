@@ -4,13 +4,15 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  socialImage?: string | null;
 }
 
 const {
   title = '랑이오스페어 | RANG-IOSPHERE',
   description = '관측하고, 비교하고, 기록하는 개인 천체관측 아카이브',
+  socialImage = '/og.png',
 } = Astro.props;
-const socialImage = new URL('/og.png', Astro.site ?? Astro.url);
+const resolvedSocialImage = socialImage ? new URL(socialImage, Astro.site ?? Astro.url) : null;
 ---
 
 <!doctype html>
@@ -24,11 +26,11 @@ const socialImage = new URL('/og.png', Astro.site ?? Astro.url);
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={socialImage} />
+    {resolvedSocialImage && <meta property="og:image" content={resolvedSocialImage} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={socialImage} />
+    {resolvedSocialImage && <meta name="twitter:image" content={resolvedSocialImage} />}
     <title>{title}</title>
   </head>
   <body>
