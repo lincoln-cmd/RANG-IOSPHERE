@@ -7,7 +7,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "new:post": "node scripts/new-post.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
+    "prepublish:check": "pnpm validate:content --strict && astro check && astro build"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -16,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.0"
   }
 }

@@ -36,3 +36,9 @@ pnpm build
 현재 초기 홈 화면과 정보 구조를 구현하고 있습니다.
 
 게시물 작성 방법은 [게시물 작성 가이드](docs/WRITING.md)를 참고하세요. 작성 중인 글은 `draft: true`로 두면 빌드 결과와 아카이브에서 자동으로 제외됩니다.
+
+```bash
+pnpm new:post          # 대화형 새 초안 생성
+pnpm validate:content # 게시물 검사
+pnpm prepublish:check # 공개 전 엄격 검사와 빌드
+```
