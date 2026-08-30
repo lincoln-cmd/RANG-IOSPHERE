@@ -27,11 +27,7 @@ collections:
     format: "frontmatter"
     preview_path: "archive/{{slug}}"
     summary: "{{title}} · {{category}} · {{publishedAt}}"
-    sortable_fields:
-      fields: ["title", "publishedAt", "updatedAt", "category"]
-      default:
-        field: "updatedAt"
-        direction: "Descending"
+    sortable_fields: ["title", "publishedAt", "updatedAt", "category"]
     fields:
       - label: "제목"
         name: "title"
