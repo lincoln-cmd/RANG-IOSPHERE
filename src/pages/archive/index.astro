@@ -23,16 +23,33 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       ))}
     </nav>
 
+    <section class="archive-tools" aria-labelledby="archive-search-title">
+      <div class="archive-search">
+        <label id="archive-search-title" for="archive-query">기록 검색</label>
+        <div>
+          <span aria-hidden="true">⌕</span>
+          <input id="archive-query" type="search" placeholder="제목, 설명, 태그 검색" autocomplete="off" />
+        </div>
+      </div>
+      <div class="archive-filters" aria-label="기록 분류 필터">
+        <button type="button" data-category-filter="all" aria-pressed="true">전체</button>
+        {Object.entries(categories).map(([key, category]) => (
+          <button type="button" data-category-filter={key} aria-pressed="false">{category.label}</button>
+        ))}
+      </div>
+      <p class="archive-result" aria-live="polite"><strong>{posts.length}</strong>개의 공개 기록</p>
+    </section>
+
     <div class="archive-sections">
       {Object.entries(categories).map(([key, category]) => {
         const categoryPosts = posts.filter((post) => post.data.category === key);
         return (
-          <section class="archive-group" id={key}>
-            <header><span>{category.index}</span><div><p>{category.en}</p><h2>{category.label}</h2></div><strong>{String(categoryPosts.length).padStart(2, '0')}</strong></header>
+          <section class="archive-group" id={key} data-category={key}>
+            <header><span>{category.index}</span><div><p>{category.en}</p><h2>{category.label}</h2></div><strong data-group-count>{String(categoryPosts.length).padStart(2, '0')}</strong></header>
             {categoryPosts.length ? (
               <div class="post-list">
                 {categoryPosts.map((post) => (
-                  <article>
+                  <article data-archive-post data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')}>
                     <p>{formatDate(post.data.publishedAt)}</p>
                     <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
                     <p>{post.data.description}</p>
@@ -47,7 +64,55 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
           </section>
         );
       })}
+      <div class="archive-no-results" hidden>
+        <span aria-hidden="true">Ø</span>
+        <div><strong>조건에 맞는 기록이 없습니다.</strong><p>검색어를 바꾸거나 다른 분류를 선택해 보세요.</p></div>
+      </div>
     </div>
   </main>
   <SiteFooter />
+
+  <script is:inline>
+    const queryInput = document.querySelector('#archive-query');
+    const filterButtons = [...document.querySelectorAll('[data-category-filter]')];
+    const groups = [...document.querySelectorAll('[data-category]')];
+    const result = document.querySelector('.archive-result');
+    const noResults = document.querySelector('.archive-no-results');
+    let selectedCategory = 'all';
+
+    const normalize = (value) => value.trim().toLocaleLowerCase('ko');
+    const applyArchiveFilters = () => {
+      const query = normalize(queryInput?.value ?? '');
+      let visibleTotal = 0;
+
+      groups.forEach((group) => {
+        const categoryMatches = selectedCategory === 'all' || group.dataset.category === selectedCategory;
+        const posts = [...group.querySelectorAll('[data-archive-post]')];
+        let visibleInGroup = 0;
+
+        posts.forEach((post) => {
+          const queryMatches = !query || post.dataset.search.includes(query);
+          const visible = categoryMatches && queryMatches;
+          post.hidden = !visible;
+          if (visible) visibleInGroup += 1;
+        });
+
+        const keepEmptyCategory = categoryMatches && !query && posts.length === 0;
+        group.hidden = !(visibleInGroup > 0 || keepEmptyCategory);
+        const count = group.querySelector('[data-group-count]');
+        if (count) count.textContent = String(visibleInGroup).padStart(2, '0');
+        visibleTotal += visibleInGroup;
+      });
+
+      if (result) result.innerHTML = `<strong>${visibleTotal}</strong>개의 공개 기록`;
+      if (noResults) noResults.hidden = !query || visibleTotal > 0;
+    };
+
+    queryInput?.addEventListener('input', applyArchiveFilters);
+    filterButtons.forEach((button) => button.addEventListener('click', () => {
+      selectedCategory = button.dataset.categoryFilter;
+      filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+      applyArchiveFilters();
+    }));
+  </script>
 </BaseLayout>
