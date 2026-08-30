@@ -1,0 +1,133 @@
+backend:
+  name: github
+  repo: lincoln-cmd/RANG-IOSPHERE
+  branch: main
+  base_url: https://rangistein-decap-auth.dhkim1551.workers.dev
+  auth_endpoint: /auth
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+site_url: "https://rang-iosphere.pages.dev"
+display_url: "https://rang-iosphere.pages.dev"
+logo_url: "/favicon.svg"
+
+locale: "ko"
+
+collections:
+  - name: "posts"
+    label: "천체 관측 아카이브"
+    label_singular: "게시물"
+    description: "관측 기록, 장비 사용기, 이론 정리, 시뮬레이션 및 공개 데이터 탐구를 작성합니다."
+    folder: "src/data/posts"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    preview_path: "archive/{{slug}}"
+    summary: "{{title}} · {{category}} · {{publishedAt}}"
+    sortable_fields:
+      fields: ["title", "publishedAt", "updatedAt", "category"]
+      default:
+        field: "updatedAt"
+        direction: "Descending"
+    fields:
+      - label: "제목"
+        name: "title"
+        widget: "string"
+        hint: "기록의 주제와 대상을 짧고 명확하게 입력합니다."
+
+      - label: "설명"
+        name: "description"
+        widget: "text"
+        hint: "목록과 검색 결과에 표시할 요약을 1~2문장으로 입력합니다."
+
+      - label: "분류"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "관측 기록", value: "observation" }
+          - { label: "장비", value: "equipment" }
+          - { label: "이론", value: "theory" }
+          - { label: "시뮬레이션", value: "simulation" }
+          - { label: "공개 데이터", value: "open-data" }
+
+      - label: "태그"
+        name: "tags"
+        widget: "list"
+        allow_add: true
+        required: false
+        default: []
+        hint: "같은 의미의 태그는 기존 표기와 통일합니다."
+
+      - label: "발행일"
+        name: "publishedAt"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        hint: "공개할 글에는 발행일을 입력합니다."
+
+      - label: "수정일"
+        name: "updatedAt"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+
+      - label: "초안"
+        name: "draft"
+        widget: "boolean"
+        default: true
+        required: false
+        hint: "활성화된 글은 사이트에 공개되지 않습니다."
+
+      - label: "대표 글"
+        name: "featured"
+        widget: "boolean"
+        default: false
+        required: false
+
+      - label: "연재"
+        name: "series"
+        widget: "string"
+        required: false
+        hint: "연속된 탐구 기록일 때만 연재명을 입력합니다."
+
+      - label: "대표 이미지"
+        name: "cover"
+        widget: "image"
+        required: false
+        choose_url: true
+
+      - label: "관측 정보"
+        name: "observation"
+        widget: "object"
+        required: false
+        collapsed: true
+        hint: "실제 관측을 수행한 글에만 작성합니다."
+        fields:
+          - { label: "관측 대상", name: "target", widget: "string", required: false }
+          - label: "관측 시각"
+            name: "observedAt"
+            widget: "datetime"
+            required: false
+            format: "YYYY-MM-DDTHH:mm:ssZ"
+            date_format: "YYYY-MM-DD"
+            time_format: "HH:mm"
+          - { label: "관측 장소", name: "location", widget: "string", required: false }
+          - label: "사용 장비"
+            name: "equipment"
+            widget: "list"
+            allow_add: true
+            required: false
+            default: []
+          - { label: "관측 조건", name: "conditions", widget: "text", required: false }
+
+      - label: "본문"
+        name: "body"
+        widget: "markdown"
+        hint: "직접 확인한 사실, 해석, 참고한 데이터의 출처를 구분해 기록합니다."
