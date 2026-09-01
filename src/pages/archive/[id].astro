@@ -6,6 +6,7 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import { byPublishedDate, categories, formatDate, type PostEntry } from '../../lib/content';
 import '../../styles/series.css';
 import '../../styles/reading.css';
+import '../../styles/sharing.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
@@ -66,6 +67,11 @@ const articleStructuredData = {
       <p>{post.data.description}</p>
       <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span><span>약 {readingMinutes}분</span></div>
       <div class="article-tags">{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
+      <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL}>
+        <button type="button" data-copy-link>링크 복사 <span aria-hidden="true">↗</span></button>
+        <button type="button" data-native-share hidden>공유 <span aria-hidden="true">↗</span></button>
+        <p role="status" aria-live="polite"></p>
+      </div>
     </header>
 
     {post.data.cover && <figure class="article-cover"><img src={post.data.cover} alt={post.data.coverAlt ?? ''} decoding="async" /><figcaption>{post.data.coverAlt}</figcaption></figure>}
@@ -127,5 +133,38 @@ const articleStructuredData = {
     addEventListener('scroll', requestProgressUpdate, { passive: true });
     addEventListener('resize', requestProgressUpdate);
     updateReadingProgress();
+
+    const actions = document.querySelector('.article-actions');
+    const copyButton = actions?.querySelector('[data-copy-link]');
+    const shareButton = actions?.querySelector('[data-native-share]');
+    const shareStatus = actions?.querySelector('[role="status"]');
+    const shareURL = actions?.dataset.shareUrl || window.location.href;
+    const setShareStatus = (message) => {
+      if (shareStatus) shareStatus.textContent = message;
+    };
+    const fallbackCopy = () => {
+      const textarea = document.createElement('textarea');
+      textarea.value = shareURL; textarea.setAttribute('readonly', ''); textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+      document.body.append(textarea); textarea.select();
+      const copied = document.execCommand('copy'); textarea.remove();
+      if (!copied) throw new Error('copy failed');
+    };
+    copyButton?.addEventListener('click', async () => {
+      try {
+        if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(shareURL); else fallbackCopy();
+        setShareStatus('게시물 링크를 복사했습니다.');
+      } catch { setShareStatus('링크를 복사하지 못했습니다. 주소창에서 직접 복사해 주세요.'); }
+    });
+    if (shareButton && navigator.share) {
+      shareButton.hidden = false;
+      shareButton.addEventListener('click', async () => {
+        try {
+          await navigator.share({ title: actions?.dataset.shareTitle, text: actions?.dataset.shareText, url: shareURL });
+          setShareStatus('공유 메뉴를 열었습니다.');
+        } catch (error) {
+          if (error?.name !== 'AbortError') setShareStatus('공유 메뉴를 열지 못했습니다. 링크 복사를 이용해 주세요.');
+        }
+      });
+    }
   </script>
 </BaseLayout>

@@ -1,0 +1,5 @@
+.article-actions { min-height:38px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:24px; }
+.article-actions button { min-height:34px; padding:0 12px; border:1px solid var(--line); color:#aeb7c6; background:rgba(7,11,21,.45); font:10px 'Noto Sans KR'; cursor:pointer; }
+.article-actions button span { margin-left:8px; color:var(--accent); }
+.article-actions button:hover,.article-actions button:focus-visible { color:var(--accent); border-color:var(--accent); outline:none; }
+.article-actions p { width:100%; min-height:16px; margin:2px 0 0; color:var(--muted); font-size:10px; }
