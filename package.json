@@ -1,16 +1,17 @@
 {
-  "name": "lang-iosphere",
+  "name": "rang-iosphere",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "pnpm validate:content && pnpm check && pnpm build:site",
+    "build:site": "astro build",
     "preview": "astro preview",
     "check": "astro check",
     "new:post": "node scripts/new-post.mjs",
     "validate:content": "node scripts/validate-content.mjs",
-    "prepublish:check": "pnpm validate:content --strict && astro check && astro build"
+    "prepublish:check": "pnpm validate:content --strict && pnpm check && pnpm build:site"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

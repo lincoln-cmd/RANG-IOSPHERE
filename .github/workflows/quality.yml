@@ -38,11 +38,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate content
-        run: pnpm validate:content
-
-      - name: Check Astro project
-        run: pnpm check
-
-      - name: Build production site
+      - name: Validate and build production site
         run: pnpm build
