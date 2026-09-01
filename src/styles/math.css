@@ -1,0 +1,4 @@
+.prose .katex { color:#e4e9f1; font-size:1.05em; }
+.prose .katex-display { margin:30px 0; padding:22px; overflow-x:auto; overflow-y:hidden; border:1px solid var(--line); background:#090f1d; text-align:center; }
+.prose .katex-display>.katex { min-width:max-content; }
+@media (max-width:560px) { .prose .katex-display { margin:24px -8px; padding:18px 12px; text-align:left; } }

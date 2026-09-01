@@ -7,6 +7,8 @@ import { byPublishedDate, categories, formatDate, type PostEntry } from '../../l
 import '../../styles/series.css';
 import '../../styles/reading.css';
 import '../../styles/sharing.css';
+import 'katex/dist/katex.min.css';
+import '../../styles/math.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
