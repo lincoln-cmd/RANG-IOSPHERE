@@ -9,6 +9,7 @@ import '../../styles/reading.css';
 import '../../styles/sharing.css';
 import 'katex/dist/katex.min.css';
 import '../../styles/math.css';
+import '../../styles/image-viewer.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
@@ -112,6 +113,11 @@ const articleStructuredData = {
     </nav>
 
     {related.length > 0 && <section class="related-posts"><p class="eyebrow">RELATED RECORDS</p><h2>함께 읽을 기록</h2><div>{related.map((entry) => <a href={`/archive/${entry.id}/`}><span>{categories[entry.data.category].label}</span><strong>{entry.data.title}</strong><p>{entry.data.description}</p></a>)}</div></section>}
+
+    <dialog class="image-viewer" aria-label="게시물 이미지 확대 보기">
+      <button type="button" data-viewer-close aria-label="이미지 확대 보기 닫기">닫기 <span aria-hidden="true">×</span></button>
+      <figure><img src="" alt="" /><figcaption></figcaption></figure>
+    </dialog>
   </main>
   <SiteFooter />
   <script is:inline>
@@ -179,5 +185,29 @@ const articleStructuredData = {
         }
       });
     }
+
+    const imageViewer = document.querySelector('dialog.image-viewer');
+    const viewerImage = imageViewer?.querySelector('img');
+    const viewerCaption = imageViewer?.querySelector('figcaption');
+    const closeViewerButton = imageViewer?.querySelector('[data-viewer-close]');
+    const viewableImages = [...document.querySelectorAll('.article-cover img, .prose img')].filter((image) => image instanceof HTMLImageElement);
+    const openImageViewer = (image) => {
+      if (!imageViewer || !viewerImage || !(image instanceof HTMLImageElement)) return;
+      if (typeof imageViewer.showModal !== 'function') { window.open(image.currentSrc || image.src, '_blank', 'noopener'); return; }
+      viewerImage.src = image.currentSrc || image.src;
+      viewerImage.alt = image.alt;
+      if (viewerCaption) { viewerCaption.textContent = image.alt; viewerCaption.hidden = !image.alt; }
+      imageViewer.showModal();
+    };
+    viewableImages.forEach((image) => {
+      image.tabIndex = 0;
+      image.setAttribute('role', 'button');
+      image.setAttribute('aria-label', `${image.alt || '게시물 이미지'} 확대 보기`);
+      image.addEventListener('click', () => openImageViewer(image));
+      image.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openImageViewer(image); } });
+    });
+    closeViewerButton?.addEventListener('click', () => imageViewer?.close());
+    imageViewer?.addEventListener('click', (event) => { if (event.target === imageViewer) imageViewer.close(); });
+    imageViewer?.addEventListener('close', () => { if (viewerImage) viewerImage.src = ''; });
   </script>
 </BaseLayout>
