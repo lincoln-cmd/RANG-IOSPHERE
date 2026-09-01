@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "astro dev",
     "build": "pnpm validate:content && pnpm check && pnpm build:site",
-    "build:site": "astro build",
+    "build:site": "astro build && node scripts/write-build-info.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "new:post": "node scripts/new-post.mjs",
+    "smoke:test": "node scripts/smoke-test.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "prepublish:check": "pnpm validate:content --strict && pnpm check && pnpm build:site"
   },
