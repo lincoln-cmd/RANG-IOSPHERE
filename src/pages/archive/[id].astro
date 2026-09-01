@@ -56,7 +56,7 @@ const articleStructuredData = {
       <h1>{post.data.title}</h1>
       <p>{post.data.description}</p>
       <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span></div>
-      <div class="article-tags">{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+      <div class="article-tags">{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
     </header>
 
     {post.data.cover && <figure class="article-cover"><img src={post.data.cover} alt={post.data.coverAlt ?? ''} decoding="async" /><figcaption>{post.data.coverAlt}</figcaption></figure>}
