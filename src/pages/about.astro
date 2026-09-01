@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { categories } from '../lib/content';
+import '../styles/about.css';
+
+const principles = [
+  { index: '01', title: '관측에서 시작', text: '망원경으로 직접 확인한 대상과 관측 조건, 장비 운용 과정을 기록의 출발점으로 삼습니다.' },
+  { index: '02', title: '값을 나란히 비교', text: '관측값과 시뮬레이션 결과, 공개 천문 데이터를 구분해 기록하고 서로의 차이를 살펴봅니다.' },
+  { index: '03', title: '과정을 남기는 탐구', text: '완성된 결론만 제시하기보다 질문, 방법, 참고 자료와 해석의 과정을 함께 축적합니다.' },
+];
+
+const workflow = [
+  ['OBSERVE', '관측', '대상과 목적을 정하고 현장에서 조건과 결과를 기록합니다.'],
+  ['VERIFY', '확인', '자료와 출처를 대조해 관측 과정과 설명을 점검합니다.'],
+  ['COMPARE', '비교', '필요한 경우 시뮬레이션과 공개 데이터로 관측값을 비교합니다.'],
+  ['ARCHIVE', '정리', '재현 가능한 정보와 남은 질문을 하나의 기록으로 공개합니다.'],
+];
+
+const aboutStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: '랑이오스페어 프로젝트 소개',
+  description: '직접 수행한 천체 관측과 이론, 시뮬레이션, 공개 데이터를 연결해 기록하는 개인 천체관측 아카이브의 목적과 기록 원칙',
+  inLanguage: 'ko-KR',
+};
+---
+
+<BaseLayout title="프로젝트 소개 | 랑이오스페어" description="랑이오스페어가 천체 관측과 이론, 시뮬레이션, 공개 데이터를 기록하는 방식" structuredData={aboutStructuredData}>
+  <SiteHeader compact />
+  <main class="about-page">
+    <header class="about-hero">
+      <p class="eyebrow">ABOUT RANG-IOSPHERE</p>
+      <h1>밤하늘을 관측하고,<br /><em>근거와 과정으로 남깁니다.</em></h1>
+      <p>랑이오스페어는 직접 수행한 천체 관측을 중심으로 장비 운용, 관측 이론, 시뮬레이션과 공개 데이터를 연결해 정리하는 개인 천체관측 아카이브입니다.</p>
+      <dl>
+        <div><dt>FOCUS</dt><dd>FIELD PRACTICE</dd></div>
+        <div><dt>FORMAT</dt><dd>OPEN ARCHIVE</dd></div>
+        <div><dt>STATUS</dt><dd>ONGOING</dd></div>
+      </dl>
+    </header>
+
+    <section class="about-principles" aria-labelledby="principles-title">
+      <div class="about-section-heading">
+        <p class="eyebrow">ARCHIVE PRINCIPLES</p>
+        <h2 id="principles-title">기록의 기준</h2>
+        <p>취미로 시작한 관측의 즐거움은 유지하되, 다시 확인하고 이어서 탐구할 수 있는 형태로 정리합니다.</p>
+      </div>
+      <div class="principle-grid">
+        {principles.map((principle) => <article><span>{principle.index}</span><h3>{principle.title}</h3><p>{principle.text}</p></article>)}
+      </div>
+    </section>
+
+    <section class="about-workflow" aria-labelledby="workflow-title">
+      <div>
+        <p class="eyebrow">OBSERVATION TO ARCHIVE</p>
+        <h2 id="workflow-title">하나의 기록이 만들어지는 과정</h2>
+      </div>
+      <ol>{workflow.map(([en, title, text], index) => <li><span>{String(index + 1).padStart(2, '0')}</span><small>{en}</small><h3>{title}</h3><p>{text}</p></li>)}</ol>
+    </section>
+
+    <section class="about-sectors" aria-labelledby="sectors-title">
+      <div class="about-section-heading">
+        <p class="eyebrow">FIVE OBSERVATION SECTORS</p>
+        <h2 id="sectors-title">다섯 영역, 하나의 탐구</h2>
+        <p>각 기록은 성격에 따라 나뉘지만, 실제 관측을 더 잘 이해하기 위한 하나의 흐름으로 연결됩니다.</p>
+      </div>
+      <div>{Object.entries(categories).map(([key, category]) => <a href={`/archive/#${key}`}><span>{category.index}</span><small>{category.en}</small><strong>{category.label}</strong><i aria-hidden="true">↗</i></a>)}</div>
+    </section>
+
+    <section class="about-boundary">
+      <p class="eyebrow">SCOPE & TRANSPARENCY</p>
+      <h2>관측값과 외부 데이터를<br />명확히 구분합니다.</h2>
+      <p>직접 관측한 사실, 계산하거나 시뮬레이션한 값, 외부 공개 데이터와 참고 자료를 가능한 한 구분해 표시합니다. 기록은 새로운 관측과 학습에 따라 보완될 수 있으며, 수정일과 출처를 함께 남깁니다.</p>
+      <a class="primary-action" href="/archive/">아카이브 살펴보기 <span>↘</span></a>
+    </section>
+  </main>
+  <SiteFooter />
+</BaseLayout>

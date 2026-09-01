@@ -1,0 +1,39 @@
+.about-page { background:#080c17; }
+.about-hero { min-height:620px; padding:100px 8vw 70px; border-bottom:1px solid var(--line); background:radial-gradient(circle at 78% 25%,rgba(58,86,138,.25),transparent 27rem); }
+.about-hero h1 { max-width:1000px; }
+.about-hero>p:not(.eyebrow) { max-width:680px; color:#aeb6c5; font-size:15px; line-height:1.9; }
+.about-hero dl { display:flex; gap:1px; margin:65px 0 0; }
+.about-hero dl div { min-width:190px; padding:17px 18px; border:1px solid var(--line); }
+.about-hero dt { color:var(--muted); font:9px 'IBM Plex Mono'; }
+.about-hero dd { margin:8px 0 0; color:var(--accent); font:14px 'IBM Plex Mono'; }
+.about-principles,.about-sectors { padding:110px 8vw; border-bottom:1px solid var(--line); }
+.about-section-heading { display:grid; grid-template-columns:.7fr 1.2fr 1fr; gap:5vw; align-items:end; margin-bottom:55px; }
+.about-section-heading h2 { margin:0; font-size:clamp(2.4rem,4vw,4.5rem); letter-spacing:-.05em; }
+.about-section-heading>p:last-child { margin:0; color:var(--muted); font-size:13px; line-height:1.8; }
+.principle-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; border:1px solid var(--line); background:var(--line); }
+.principle-grid article { min-height:300px; padding:28px; background:#0a0f1c; }
+.principle-grid span { color:var(--accent); font:10px 'IBM Plex Mono'; }
+.principle-grid h3 { margin:80px 0 18px; font-size:24px; }
+.principle-grid p { max-width:340px; color:var(--muted); font-size:13px; line-height:1.85; }
+.about-workflow { padding:110px 8vw; display:grid; grid-template-columns:.8fr 1.8fr; gap:8vw; border-bottom:1px solid var(--line); background:#070b15; }
+.about-workflow h2 { max-width:420px; margin:20px 0 0; font-size:clamp(2.3rem,4vw,4rem); line-height:1.15; letter-spacing:-.05em; }
+.about-workflow ol { margin:0; padding:0; list-style:none; border-top:1px solid var(--line); }
+.about-workflow li { min-height:135px; display:grid; grid-template-columns:45px 85px 120px 1fr; align-items:center; gap:20px; border-bottom:1px solid var(--line); }
+.about-workflow li>span,.about-workflow li>small { color:var(--accent); font:9px 'IBM Plex Mono'; }
+.about-workflow li>small { color:var(--muted); }
+.about-workflow h3 { font-size:18px; }
+.about-workflow li p { color:var(--muted); font-size:12px; line-height:1.8; }
+.about-sectors>div:last-child { display:grid; grid-template-columns:repeat(5,1fr); border:1px solid var(--line); background:var(--line); gap:1px; }
+.about-sectors a { min-height:210px; padding:22px; display:flex; flex-direction:column; background:#0a0f1c; }
+.about-sectors a:hover { background:#10182b; }
+.about-sectors a span,.about-sectors a small { color:var(--accent); font:9px 'IBM Plex Mono'; }
+.about-sectors a small { margin-top:8px; color:var(--muted); }
+.about-sectors a strong { margin-top:auto; font-size:17px; }
+.about-sectors a i { align-self:flex-end; color:var(--accent); font-style:normal; }
+.about-boundary { min-height:540px; padding:110px 8vw; display:grid; grid-template-columns:1.2fr 1fr; column-gap:8vw; align-content:center; background:radial-gradient(circle at 18% 55%,rgba(48,74,121,.22),transparent 24rem); }
+.about-boundary>.eyebrow { grid-column:1/-1; }
+.about-boundary h2 { margin:18px 0 0; font-size:clamp(2.5rem,4.5vw,5rem); line-height:1.1; letter-spacing:-.055em; }
+.about-boundary>p:not(.eyebrow) { align-self:center; color:#aeb6c5; font-size:14px; line-height:2; }
+.about-boundary .primary-action { grid-column:2; }
+@media (max-width:900px) { .about-section-heading,.about-workflow,.about-boundary { grid-template-columns:1fr; }.about-section-heading { align-items:start; }.about-workflow { gap:55px; }.about-sectors>div:last-child { grid-template-columns:repeat(2,1fr); }.about-boundary .primary-action { grid-column:1; } }
+@media (max-width:560px) { .about-hero { min-height:auto; padding:70px 20px 60px; }.about-hero h1 { font-size:3rem; }.about-hero dl { overflow-x:auto; }.about-hero dl div { min-width:155px; }.about-principles,.about-sectors,.about-workflow,.about-boundary { padding:80px 20px; }.principle-grid { grid-template-columns:1fr; }.principle-grid article { min-height:250px; }.principle-grid h3 { margin-top:55px; }.about-workflow li { grid-template-columns:34px 1fr; padding:22px 0; }.about-workflow li>small,.about-workflow li h3,.about-workflow li p { grid-column:2; }.about-workflow li h3,.about-workflow li p { margin:0; }.about-sectors>div:last-child { grid-template-columns:1fr; }.about-sectors a { min-height:150px; } }

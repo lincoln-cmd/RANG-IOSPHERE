@@ -29,11 +29,12 @@ pnpm build
 
 - Astro
 - TypeScript
-- Cloudflare 배포 예정
+- Cloudflare Pages
+- Decap CMS
 
 ## 상태
 
-현재 초기 홈 화면과 정보 구조를 구현하고 있습니다.
+홈, 프로젝트 소개, 아카이브와 게시물 상세 화면을 운영하고 있습니다. GitHub 품질 검사를 통과한 커밋은 Cloudflare Pages에 배포되며 프로덕션 스모크 테스트로 주요 경로를 확인합니다.
 
 게시물 작성 방법은 [게시물 작성 가이드](docs/WRITING.md)를 참고하세요. 작성 중인 글은 `draft: true`로 두면 빌드 결과와 아카이브에서 자동으로 제외됩니다.
 

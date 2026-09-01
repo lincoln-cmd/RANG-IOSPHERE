@@ -31,6 +31,7 @@ if (expectedCommit && deployedCommit !== expectedCommit) {
 
 const checks = [
   ['/', '랑이와 함께 보는'],
+  ['/about/', '밤하늘을 관측하고'],
   ['/archive/', '관측과 탐구의 기록'],
   ['/admin/', 'RANG-IOSPHERE CMS'],
   ['/rss.xml', '<rss'],
@@ -46,14 +47,11 @@ for (const [path, marker] of checks) {
 const { body: sitemapIndex } = await request('/sitemap-index.xml');
 const childSitemapURL = sitemapIndex.match(/<loc>([^<]+)<\/loc>/)?.[1];
 if (childSitemapURL) {
-  const childResponse = await fetch(childSitemapURL, { signal: AbortSignal.timeout(15_000) });
-  if (!childResponse.ok) throw new Error(`하위 사이트맵: HTTP ${childResponse.status}`);
-  const childSitemap = await childResponse.text();
+  const { body: childSitemap } = await request(new URL(childSitemapURL).pathname);
   const articleURL = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).find((url) => /\/archive\/[^/]+\/$/.test(url));
   if (articleURL) {
-    const articleResponse = await fetch(articleURL, { signal: AbortSignal.timeout(15_000) });
-    const articleBody = await articleResponse.text();
-    if (!articleResponse.ok || !articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
+    const { body: articleBody } = await request(new URL(articleURL).pathname);
+    if (!articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
     console.log(`통과  ${new URL(articleURL).pathname}`);
   }
 }
