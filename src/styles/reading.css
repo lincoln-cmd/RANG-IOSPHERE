@@ -1,3 +1,6 @@
 .reading-progress { position:fixed; z-index:30; inset:0 0 auto; height:2px; background:rgba(147,183,255,.12); pointer-events:none; }
 .reading-progress span { display:block; width:var(--reading-progress,0%); height:100%; background:var(--accent); box-shadow:0 0 9px rgba(184,255,90,.65); transition:width .1s linear; }
+.article-toc a { position:relative; display:block; transition:color .18s ease,transform .18s ease; }
+.article-toc a[aria-current="location"] { color:var(--accent); transform:translateX(8px); }
+.article-toc a[aria-current="location"]::before { content:'›'; position:absolute; left:-12px; color:var(--accent); }
 @media (prefers-reduced-motion:reduce) { .reading-progress span { transition:none; } }
