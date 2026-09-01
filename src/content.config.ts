@@ -15,6 +15,7 @@ const posts = defineCollection({
     featured: z.boolean().default(false),
     series: z.string().optional(),
     cover: z.string().optional(),
+    coverAlt: z.string().optional(),
     references: z.array(z.object({
       title: z.string(),
       url: z.string().url(),

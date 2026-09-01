@@ -60,6 +60,17 @@ for (const file of files) {
   }
   if (data.category === 'observation' && !data.observation) report('warning', file, '관측일지에는 observation 정보 추가를 권장합니다.');
 
+  if (data.cover && typeof data.cover !== 'string') {
+    report('error', file, 'cover는 이미지 경로 문자열이어야 합니다.');
+  } else if (data.cover) {
+    if (published && (typeof data.coverAlt !== 'string' || !data.coverAlt.trim())) report('error', file, '대표 이미지에는 이미지 설명(coverAlt)이 필요합니다.');
+    if (!/^(https?:|data:)/.test(data.cover)) {
+      const cleanCover = decodeURIComponent(data.cover.split(/[?#]/)[0]);
+      const coverPath = cleanCover.startsWith('/') ? resolve(publicDir, cleanCover.slice(1)) : resolve(dirname(file), cleanCover);
+      if (!(await exists(coverPath))) report('error', file, `대표 이미지 파일을 찾을 수 없습니다: ${data.cover}`);
+    }
+  }
+
   const location = data.observation?.location;
   if (typeof location === 'string' && (/\d/.test(location) || /(로|길|동|리)\s*\d+/u.test(location))) report('warning', file, '관측 위치에 상세 주소로 보이는 정보가 있습니다. 공개 범위를 확인하세요.');
   if (/(로|길|동|리)\s*\d{1,4}(?:-\d{1,4})?/u.test(document.body)) report('warning', file, '본문에 상세 주소로 보이는 표현이 있습니다.');

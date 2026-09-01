@@ -50,6 +50,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
               <div class="post-list">
                 {categoryPosts.map((post) => (
                   <article data-archive-post data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')}>
+                    {post.data.cover && <a class="post-cover" href={`/archive/${post.id}/`} tabindex="-1" aria-hidden="true"><img src={post.data.cover} alt="" loading="lazy" decoding="async" /></a>}
                     <p>{formatDate(post.data.publishedAt)}</p>
                     <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
                     <p>{post.data.description}</p>

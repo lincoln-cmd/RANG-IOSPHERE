@@ -41,6 +41,8 @@ const observationFacts = observation ? [
       <div class="article-tags">{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
     </header>
 
+    {post.data.cover && <figure class="article-cover"><img src={post.data.cover} alt={post.data.coverAlt ?? ''} decoding="async" /><figcaption>{post.data.coverAlt}</figcaption></figure>}
+
     <div class="article-shell">
       <aside class="article-toc" aria-label="글 목차">
         <p>CONTENTS</p>
