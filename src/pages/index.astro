@@ -2,13 +2,18 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { getCollection } from 'astro:content';
+import { byPublishedDate } from '../lib/content';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
+const highlightedPost = posts.find((post) => post.data.featured) ?? posts[0];
 
 const sectors = [
-  { id: 'log', index: '01', label: '관측일지', en: 'Observation Log', x: 23, y: 36, note: '밤하늘에서 직접 얻은 기록' },
-  { id: 'gear', index: '02', label: '장비와 사용법', en: 'Equipment', x: 42, y: 23, note: '망원경의 구조와 운용' },
-  { id: 'theory', index: '03', label: '관측 이론', en: 'Field Theory', x: 58, y: 43, note: '관측을 이해하는 데 필요한 이론' },
-  { id: 'simulation', index: '04', label: '시뮬레이션', en: 'Simulation', x: 72, y: 27, note: '예측값과 실제 관측의 비교' },
-  { id: 'data', index: '05', label: '오픈데이터', en: 'Open Data', x: 80, y: 61, note: '공개 천문 데이터 탐구' },
+  { id: 'log', category: 'observation', index: '01', label: '관측일지', en: 'Observation Log', x: 23, y: 36, note: '밤하늘에서 직접 얻은 기록' },
+  { id: 'gear', category: 'equipment', index: '02', label: '장비와 사용법', en: 'Equipment', x: 42, y: 23, note: '망원경의 구조와 운용' },
+  { id: 'theory', category: 'theory', index: '03', label: '관측 이론', en: 'Field Theory', x: 58, y: 43, note: '관측을 이해하는 데 필요한 이론' },
+  { id: 'simulation', category: 'simulation', index: '04', label: '시뮬레이션', en: 'Simulation', x: 72, y: 27, note: '예측값과 실제 관측의 비교' },
+  { id: 'data', category: 'open-data', index: '05', label: '오픈데이터', en: 'Open Data', x: 80, y: 61, note: '공개 천문 데이터 탐구' },
 ];
 ---
 
@@ -49,22 +54,36 @@ const sectors = [
       <div class="sector-grid">
         {sectors.map((sector) => (
           <article class="sector-card" id={sector.id}>
-            <div><span>{sector.index}</span><small>{sector.en}</small></div>
+            <div><span>{sector.index}</span><small>{sector.en} · {String(posts.filter((post) => post.data.category === sector.category).length).padStart(2, '0')}</small></div>
             <h3>{sector.label}</h3>
             <p>{sector.note}</p>
-            <a href={`/archive/#${sector.id === 'log' ? 'observation' : sector.id === 'gear' ? 'equipment' : sector.id === 'data' ? 'open-data' : sector.id}`} aria-label={`${sector.label} 아카이브 보기`}>OPEN ARCHIVE <span>↗</span></a>
+            <a href={`/archive/#${sector.category}`} aria-label={`${sector.label} 아카이브 보기`}>OPEN ARCHIVE <span>↗</span></a>
           </article>
         ))}
       </div>
     </section>
 
-    <section class="first-record" id="about">
-      <div>
-        <p class="eyebrow">FIRST FIELD NOTE · PREPARING</p>
-        <h2>망원경은 어떻게<br />빛을 모으는가</h2>
-      </div>
-      <p>첫 기록에서는 굴절식·반사식·복합식 망원경의 구조와 광경로, 실제 작동 방식의 차이를 탐구합니다.</p>
-      <span class="record-number">0001</span>
+    <section class:list={["first-record", { "has-record-cover": Boolean(highlightedPost?.data.cover) }]} id="about">
+      {highlightedPost ? (
+        <>
+          <div>
+            <p class="eyebrow">{highlightedPost.data.featured ? 'FEATURED FIELD NOTE' : 'LATEST FIELD NOTE'}</p>
+            <h2><a href={`/archive/${highlightedPost.id}/`}>{highlightedPost.data.title}</a></h2>
+            <a class="first-record-link" href={`/archive/${highlightedPost.id}/`}>기록 읽기 <span>↗</span></a>
+          </div>
+          <p>{highlightedPost.data.description}</p>
+          <div class="first-record-visual">
+            {highlightedPost.data.cover && <img src={highlightedPost.data.cover} alt="" loading="lazy" decoding="async" />}
+            <span class="record-number">{String(posts.length - posts.indexOf(highlightedPost)).padStart(4, '0')}</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <div><p class="eyebrow">FIRST FIELD NOTE · PREPARING</p><h2>첫 번째 기록을<br />준비하고 있습니다.</h2></div>
+          <p>직접 관측하고 공부한 내용을 확인한 뒤 이곳에 첫 기록을 공개할 예정입니다.</p>
+          <span class="record-number">0000</span>
+        </>
+      )}
     </section>
 
     <SiteFooter />
