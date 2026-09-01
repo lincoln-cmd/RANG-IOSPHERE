@@ -4,17 +4,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import { byPublishedDate, categories, formatDate, type PostEntry } from '../../lib/content';
+import '../../styles/series.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
   return posts.map((post, index) => {
     const related = posts.filter((candidate) => candidate.id !== post.id && (candidate.data.category === post.data.category || candidate.data.tags.some((tag) => post.data.tags.includes(tag)))).slice(0, 3);
-    return { params: { id: post.id }, props: { post, previous: posts[index + 1], next: posts[index - 1], related } };
+    const series = post.data.series ? posts.filter((candidate) => candidate.data.series === post.data.series).sort((a, b) => (a.data.publishedAt?.getTime() ?? 0) - (b.data.publishedAt?.getTime() ?? 0)) : [];
+    return { params: { id: post.id }, props: { post, previous: posts[index + 1], next: posts[index - 1], related, series } };
   });
 }
 
-interface Props { post: PostEntry; previous?: PostEntry; next?: PostEntry; related: PostEntry[] }
-const { post, previous, next, related } = Astro.props;
+interface Props { post: PostEntry; previous?: PostEntry; next?: PostEntry; related: PostEntry[]; series: PostEntry[] }
+const { post, previous, next, related, series } = Astro.props;
 const { Content, headings } = await render(post);
 const category = categories[post.data.category];
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
@@ -60,6 +62,8 @@ const articleStructuredData = {
     </header>
 
     {post.data.cover && <figure class="article-cover"><img src={post.data.cover} alt={post.data.coverAlt ?? ''} decoding="async" /><figcaption>{post.data.coverAlt}</figcaption></figure>}
+
+    {post.data.series && series.length > 0 && <nav class="series-panel" aria-label={`${post.data.series} 연재`}><div><p>SERIES</p><h2>{post.data.series}</h2><span>{series.findIndex((entry) => entry.id === post.id) + 1} / {series.length}</span></div><ol>{series.map((entry, index) => <li class:list={{ current: entry.id === post.id }}><a href={`/archive/${entry.id}/`} aria-current={entry.id === post.id ? 'page' : undefined}><span>{String(index + 1).padStart(2, '0')}</span><strong>{entry.data.title}</strong></a></li>)}</ol><a href={`/archive/?series=${encodeURIComponent(post.data.series)}`}>연재 전체 보기 ↗</a></nav>}
 
     <div class="article-shell">
       <aside class="article-toc" aria-label="글 목차">

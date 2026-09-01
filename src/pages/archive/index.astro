@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import { byPublishedDate, categories, formatDate } from '../../lib/content';
+import '../../styles/series.css';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
 ---
@@ -49,11 +50,12 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
             {categoryPosts.length ? (
               <div class="post-list">
                 {categoryPosts.map((post) => (
-                  <article data-archive-post data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')}>
+                  <article data-archive-post data-search={`${post.data.title} ${post.data.description} ${post.data.series ?? ''} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')} data-series={(post.data.series ?? '').toLocaleLowerCase('ko')}>
                     {post.data.cover && <a class="post-cover" href={`/archive/${post.id}/`} tabindex="-1" aria-hidden="true"><img src={post.data.cover} alt="" loading="lazy" decoding="async" /></a>}
                     <p>{formatDate(post.data.publishedAt)}</p>
                     <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
                     <p>{post.data.description}</p>
+                    {post.data.series && <a class="post-series" href={`/archive/?series=${encodeURIComponent(post.data.series)}`}>SERIES · {post.data.series}</a>}
                     <div>{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
                     <a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 읽기`}>READ NOTE ↗</a>
                   </article>
@@ -82,6 +84,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
     const noResults = document.querySelector('.archive-no-results');
     let selectedCategory = 'all';
     let selectedTag = '';
+    let selectedSeries = '';
 
     const normalize = (value) => value.trim().toLocaleLowerCase('ko');
     const allowedCategories = filterButtons.map((item) => item.dataset.categoryFilter);
@@ -90,6 +93,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       const category = params.get('category') || 'all';
       selectedCategory = allowedCategories.includes(category) ? category : 'all';
       selectedTag = normalize(params.get('tag') || '');
+      selectedSeries = normalize(params.get('series') || '');
       if (queryInput) queryInput.value = params.get('q') || '';
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.categoryFilter === selectedCategory)));
     };
@@ -98,6 +102,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       const query = queryInput?.value.trim() || '';
       if (query) params.set('q', query);
       if (selectedTag) params.set('tag', selectedTag);
+      if (selectedSeries) params.set('series', selectedSeries);
       if (selectedCategory !== 'all') params.set('category', selectedCategory);
       const url = `${window.location.pathname}${params.size ? `?${params}` : ''}${window.location.hash}`;
       window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
@@ -114,12 +119,13 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
         posts.forEach((post) => {
           const queryMatches = !query || post.dataset.search.includes(query);
           const tagMatches = !selectedTag || (post.dataset.tags || '').split('|').includes(selectedTag);
-          const visible = categoryMatches && queryMatches && tagMatches;
+          const seriesMatches = !selectedSeries || post.dataset.series === selectedSeries;
+          const visible = categoryMatches && queryMatches && tagMatches && seriesMatches;
           post.hidden = !visible;
           if (visible) visibleInGroup += 1;
         });
 
-        const keepEmptyCategory = categoryMatches && !query && !selectedTag && posts.length === 0;
+        const keepEmptyCategory = categoryMatches && !query && !selectedTag && !selectedSeries && posts.length === 0;
         group.hidden = !(visibleInGroup > 0 || keepEmptyCategory);
         const count = group.querySelector('[data-group-count]');
         if (count) count.textContent = String(visibleInGroup).padStart(2, '0');
@@ -129,13 +135,14 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       if (result) {
         result.replaceChildren();
         if (selectedTag) { const tag = document.createElement('span'); tag.textContent = `#${selectedTag}`; result.append(tag, ' · '); }
+        if (selectedSeries) { const series = document.createElement('span'); series.textContent = selectedSeries; result.append(series, ' 연재 · '); }
         const count = document.createElement('strong'); count.textContent = String(visibleTotal); result.append(count, '개의 공개 기록');
       }
-      if (clearButton) clearButton.hidden = !query && !selectedTag && selectedCategory === 'all';
-      if (noResults) noResults.hidden = (!query && !selectedTag) || visibleTotal > 0;
+      if (clearButton) clearButton.hidden = !query && !selectedTag && !selectedSeries && selectedCategory === 'all';
+      if (noResults) noResults.hidden = (!query && !selectedTag && !selectedSeries) || visibleTotal > 0;
     };
 
-    queryInput?.addEventListener('input', () => { selectedTag = ''; writeURLState(); applyArchiveFilters(); });
+    queryInput?.addEventListener('input', () => { selectedTag = ''; selectedSeries = ''; writeURLState(); applyArchiveFilters(); });
     filterButtons.forEach((button) => button.addEventListener('click', () => {
       selectedCategory = button.dataset.categoryFilter;
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
@@ -143,7 +150,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       applyArchiveFilters();
     }));
     clearButton?.addEventListener('click', () => {
-      selectedCategory = 'all'; selectedTag = ''; if (queryInput) queryInput.value = '';
+      selectedCategory = 'all'; selectedTag = ''; selectedSeries = ''; if (queryInput) queryInput.value = '';
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.categoryFilter === 'all')));
       writeURLState('push'); applyArchiveFilters();
     });
