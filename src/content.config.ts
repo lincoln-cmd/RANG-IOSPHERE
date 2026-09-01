@@ -18,7 +18,7 @@ const posts = defineCollection({
     coverAlt: z.string().optional(),
     references: z.array(z.object({
       title: z.string(),
-      url: z.string().url(),
+      url: z.url(),
       note: z.string().optional(),
     })).default([]),
     observation: z.object({

@@ -46,7 +46,7 @@ const serializedStructuredData = structuredData ? JSON.stringify(structuredData)
     <meta name="twitter:description" content={description} />
     {resolvedSocialImage && <meta name="twitter:image" content={resolvedSocialImage} />}
     {resolvedSocialImage && <meta name="twitter:image:alt" content={socialImageAlt} />}
-    {serializedStructuredData && <script type="application/ld+json" set:html={serializedStructuredData} />}
+    {serializedStructuredData && <script is:inline type="application/ld+json" set:html={serializedStructuredData} />}
     <title>{title}</title>
   </head>
   <body>
