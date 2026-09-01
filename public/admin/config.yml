@@ -122,6 +122,22 @@ collections:
             required: false
             default: []
           - { label: "관측 조건", name: "conditions", widget: "text", required: false }
+          - { label: "시상", name: "seeing", widget: "string", required: false, hint: "예: Antoniadi II 또는 3/5" }
+          - { label: "투명도", name: "transparency", widget: "string", required: false, hint: "예: 4/5" }
+          - { label: "기온 (°C)", name: "temperatureC", widget: "number", required: false, value_type: "float" }
+          - { label: "습도 (%)", name: "humidityPercent", widget: "number", required: false, value_type: "float", min: 0, max: 100 }
+
+      - label: "참고 자료"
+        name: "references"
+        widget: "list"
+        required: false
+        collapsed: true
+        summary: "{{fields.title}}"
+        hint: "이론, 시뮬레이션 및 공개 데이터의 출처를 기록합니다."
+        fields:
+          - { label: "자료명", name: "title", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
+          - { label: "메모", name: "note", widget: "text", required: false }
 
       - label: "본문"
         name: "body"

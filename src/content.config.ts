@@ -15,12 +15,21 @@ const posts = defineCollection({
     featured: z.boolean().default(false),
     series: z.string().optional(),
     cover: z.string().optional(),
+    references: z.array(z.object({
+      title: z.string(),
+      url: z.string().url(),
+      note: z.string().optional(),
+    })).default([]),
     observation: z.object({
       target: z.string().optional(),
       observedAt: z.coerce.date().optional(),
       location: z.string().optional(),
       equipment: z.array(z.string()).default([]),
       conditions: z.string().optional(),
+      seeing: z.string().optional(),
+      transparency: z.string().optional(),
+      temperatureC: z.number().optional(),
+      humidityPercent: z.number().min(0).max(100).optional(),
     }).optional(),
   }),
 });

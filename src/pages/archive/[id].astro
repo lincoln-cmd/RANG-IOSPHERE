@@ -18,6 +18,16 @@ const { post, previous, next, related } = Astro.props;
 const { Content, headings } = await render(post);
 const category = categories[post.data.category];
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const observation = post.data.observation;
+const observationFacts = observation ? [
+  ['관측 대상', observation.target],
+  ['관측 시각', observation.observedAt ? `${formatDate(observation.observedAt)} ${observation.observedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' })}` : undefined],
+  ['관측 장소', observation.location],
+  ['시상', observation.seeing],
+  ['투명도', observation.transparency],
+  ['기온', observation.temperatureC === undefined ? undefined : `${observation.temperatureC} °C`],
+  ['습도', observation.humidityPercent === undefined ? undefined : `${observation.humidityPercent}%`],
+].filter((entry): entry is [string, string] => Boolean(entry[1])) : [];
 ---
 <BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null}>
   <SiteHeader compact />
@@ -36,7 +46,25 @@ const toc = headings.filter((heading) => heading.depth === 2 || heading.depth ==
         <p>CONTENTS</p>
         {toc.length ? <ol>{toc.map((heading) => <li class:list={{ nested: heading.depth === 3 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol> : <span>목차가 없습니다.</span>}
       </aside>
-      <article class="prose"><Content /></article>
+      <article class="prose">
+        {observation && (observationFacts.length > 0 || observation.equipment.length > 0 || observation.conditions) && (
+          <section class="observation-card" aria-labelledby="observation-data-title">
+            <p>OBSERVATION DATA</p>
+            <h2 id="observation-data-title">관측 정보</h2>
+            {observationFacts.length > 0 && <dl>{observationFacts.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
+            {observation.equipment.length > 0 && <div class="observation-equipment"><strong>사용 장비</strong><p>{observation.equipment.join(' · ')}</p></div>}
+            {observation.conditions && <div class="observation-conditions"><strong>관측 조건</strong><p>{observation.conditions}</p></div>}
+          </section>
+        )}
+        <Content />
+        {post.data.references.length > 0 && (
+          <section class="article-references" aria-labelledby="references-title">
+            <p>REFERENCES</p>
+            <h2 id="references-title">참고 자료</h2>
+            <ol>{post.data.references.map((reference) => <li><a href={reference.url} target="_blank" rel="noreferrer"><strong>{reference.title}</strong><span>{reference.note ?? reference.url}</span><small>원문 열기 ↗</small></a></li>)}</ol>
+          </section>
+        )}
+      </article>
     </div>
 
     <nav class="post-navigation" aria-label="이전 글과 다음 글">
