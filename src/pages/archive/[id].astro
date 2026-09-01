@@ -5,6 +5,7 @@ import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import { byPublishedDate, categories, formatDate, type PostEntry } from '../../lib/content';
 import '../../styles/series.css';
+import '../../styles/reading.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
@@ -18,6 +19,10 @@ export async function getStaticPaths() {
 interface Props { post: PostEntry; previous?: PostEntry; next?: PostEntry; related: PostEntry[]; series: PostEntry[] }
 const { post, previous, next, related, series } = Astro.props;
 const { Content, headings } = await render(post);
+const plainBody = (post.body ?? '').replace(/```[\s\S]*?```|<[^>]+>|[#>*_`\[\]()!-]/g, ' ');
+const koreanCharacters = (plainBody.match(/[가-힣]/g) ?? []).length;
+const otherWords = (plainBody.replace(/[가-힣]/g, ' ').match(/[\p{L}\p{N}]+/gu) ?? []).length;
+const readingMinutes = Math.max(1, Math.ceil(koreanCharacters / 500 + otherWords / 200));
 const category = categories[post.data.category];
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const observation = post.data.observation;
@@ -44,6 +49,7 @@ const articleStructuredData = {
   articleSection: category.label,
   keywords: post.data.tags.join(', '),
   inLanguage: 'ko-KR',
+  timeRequired: `PT${readingMinutes}M`,
   image: articleImage,
   author: { '@type': 'Person', name: '김동훈' },
   publisher: { '@type': 'Person', name: '김동훈' },
@@ -52,12 +58,13 @@ const articleStructuredData = {
 <BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null} socialImageAlt={post.data.coverAlt ?? post.data.title} pageType="article" structuredData={articleStructuredData}>
   <SiteHeader compact />
   <main class="article-page">
+    <div class="reading-progress" role="progressbar" aria-label="본문 읽기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <header class="article-hero">
       <a href="/archive/" class="back-link">← ARCHIVE</a>
       <p class="eyebrow">{category.index} · {category.en}</p>
       <h1>{post.data.title}</h1>
       <p>{post.data.description}</p>
-      <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span></div>
+      <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span><span>약 {readingMinutes}분</span></div>
       <div class="article-tags">{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
     </header>
 
@@ -99,4 +106,26 @@ const articleStructuredData = {
     {related.length > 0 && <section class="related-posts"><p class="eyebrow">RELATED RECORDS</p><h2>함께 읽을 기록</h2><div>{related.map((entry) => <a href={`/archive/${entry.id}/`}><span>{categories[entry.data.category].label}</span><strong>{entry.data.title}</strong><p>{entry.data.description}</p></a>)}</div></section>}
   </main>
   <SiteFooter />
+  <script is:inline>
+    const progress = document.querySelector('.reading-progress');
+    const article = document.querySelector('.prose');
+    let scheduled = false;
+    const updateReadingProgress = () => {
+      scheduled = false;
+      if (!progress || !article) return;
+      const start = article.getBoundingClientRect().top + window.scrollY - 120;
+      const end = start + article.offsetHeight - window.innerHeight * .5;
+      const value = Math.round(Math.min(100, Math.max(0, ((window.scrollY - start) / Math.max(1, end - start)) * 100)));
+      progress.style.setProperty('--reading-progress', `${value}%`);
+      progress.setAttribute('aria-valuenow', String(value));
+    };
+    const requestProgressUpdate = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(updateReadingProgress);
+    };
+    addEventListener('scroll', requestProgressUpdate, { passive: true });
+    addEventListener('resize', requestProgressUpdate);
+    updateReadingProgress();
+  </script>
 </BaseLayout>
