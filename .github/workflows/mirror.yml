@@ -1,0 +1,46 @@
+name: Repository mirrors
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-mirrors
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    name: Mirror Git repository backups
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Create complete repository mirror
+        env:
+          SOURCE_URL: https://github.com/${{ github.repository }}.git
+        run: git clone --mirror "$SOURCE_URL" repository.git
+
+      - name: Push GitLab backup
+        env:
+          MIRROR_URL: ${{ secrets.GITLAB_MIRROR_URL }}
+        run: |
+          if [ -z "$MIRROR_URL" ]; then
+            echo "GitLab 미러 주소가 등록되지 않아 건너뜁니다."
+            exit 0
+          fi
+          git -C repository.git push --mirror "$MIRROR_URL"
+
+      - name: Push Bitbucket backup
+        env:
+          MIRROR_URL: ${{ secrets.BITBUCKET_MIRROR_URL }}
+        run: |
+          if [ -z "$MIRROR_URL" ]; then
+            echo "Bitbucket 미러 주소가 등록되지 않아 건너뜁니다."
+            exit 0
+          fi
+          git -C repository.git push --mirror "$MIRROR_URL"
