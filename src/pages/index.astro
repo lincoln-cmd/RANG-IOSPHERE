@@ -7,6 +7,20 @@ import { byPublishedDate } from '../lib/content';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
 const highlightedPost = posts.find((post) => post.data.featured) ?? posts[0];
+const siteURL = Astro.site ?? Astro.url;
+const homeStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '랑이오스페어',
+  alternateName: 'RANG-IOSPHERE',
+  url: new URL('/', siteURL).href,
+  description: '관측하고, 비교하고, 기록하는 개인 천체관측 아카이브',
+  inLanguage: 'ko-KR',
+  creator: {
+    '@type': 'Person',
+    name: '김동훈',
+  },
+};
 
 const sectors = [
   { id: 'log', category: 'observation', index: '01', label: '관측일지', en: 'Observation Log', x: 23, y: 36, note: '밤하늘에서 직접 얻은 기록' },
@@ -17,7 +31,7 @@ const sectors = [
 ];
 ---
 
-<BaseLayout>
+<BaseLayout structuredData={homeStructuredData}>
   <main>
     <SiteHeader />
 

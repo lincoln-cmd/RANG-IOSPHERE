@@ -28,8 +28,26 @@ const observationFacts = observation ? [
   ['기온', observation.temperatureC === undefined ? undefined : `${observation.temperatureC} °C`],
   ['습도', observation.humidityPercent === undefined ? undefined : `${observation.humidityPercent}%`],
 ].filter((entry): entry is [string, string] => Boolean(entry[1])) : [];
+const articleURL = new URL(`/archive/${post.id}/`, Astro.site ?? Astro.url).href;
+const articleImage = post.data.cover ? new URL(post.data.cover, Astro.site ?? Astro.url).href : undefined;
+const articleStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  url: articleURL,
+  mainEntityOfPage: articleURL,
+  datePublished: post.data.publishedAt?.toISOString(),
+  dateModified: (post.data.updatedAt ?? post.data.publishedAt)?.toISOString(),
+  articleSection: category.label,
+  keywords: post.data.tags.join(', '),
+  inLanguage: 'ko-KR',
+  image: articleImage,
+  author: { '@type': 'Person', name: '김동훈' },
+  publisher: { '@type': 'Person', name: '김동훈' },
+};
 ---
-<BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null}>
+<BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null} socialImageAlt={post.data.coverAlt ?? post.data.title} pageType="article" structuredData={articleStructuredData}>
   <SiteHeader compact />
   <main class="article-page">
     <header class="article-hero">
