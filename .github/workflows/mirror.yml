@@ -20,10 +20,14 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Create complete repository mirror
+      - name: Fetch GitHub main and tags
         env:
           SOURCE_URL: https://github.com/${{ github.repository }}.git
-        run: git clone --mirror "$SOURCE_URL" repository.git
+        run: |
+          git init --bare repository.git
+          git -C repository.git fetch --prune "$SOURCE_URL" \
+            '+refs/heads/main:refs/heads/main' \
+            '+refs/tags/*:refs/tags/*'
 
       - name: Push GitLab backup
         env:
@@ -33,7 +37,9 @@ jobs:
             echo "GitLab 미러 주소가 등록되지 않아 건너뜁니다."
             exit 0
           fi
-          git -C repository.git push --mirror "$MIRROR_URL"
+          git -C repository.git push "$MIRROR_URL" \
+            refs/heads/main:refs/heads/github-main \
+            'refs/tags/*:refs/tags/*'
 
       - name: Push Bitbucket backup
         env:
@@ -43,4 +49,6 @@ jobs:
             echo "Bitbucket 미러 주소가 등록되지 않아 건너뜁니다."
             exit 0
           fi
-          git -C repository.git push --mirror "$MIRROR_URL"
+          git -C repository.git push "$MIRROR_URL" \
+            refs/heads/main:refs/heads/github-main \
+            'refs/tags/*:refs/tags/*'
