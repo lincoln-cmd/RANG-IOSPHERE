@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import { byPublishedDate, categories, formatDate, type PostEntry } from '../../lib/content';
+import { byPublishedDate, categories, formatDate, hasObservationData, type PostEntry } from '../../lib/content';
 import '../../styles/series.css';
 import '../../styles/reading.css';
 import '../../styles/sharing.css';
@@ -32,6 +32,7 @@ const readingMinutes = Math.max(1, Math.ceil(koreanCharacters / 500 + otherWords
 const category = categories[post.data.category];
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const observation = post.data.observation;
+const showsObservation = hasObservationData(observation);
 const observationFacts = observation ? [
   ['관측 대상', observation.target],
   ['관측 시각', observation.observedAt ? `${formatDate(observation.observedAt)} ${observation.observedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' })}` : undefined],
@@ -90,13 +91,14 @@ const articleStructuredData = {
         {toc.length ? <ol>{toc.map((heading) => <li class:list={{ nested: heading.depth === 3 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol> : <span>목차가 없습니다.</span>}
       </aside>
       <article class="prose">
-        {observation && (observationFacts.length > 0 || observation.equipment.length > 0 || observation.conditions) && (
+        {observation && showsObservation && (
           <section class="observation-card" aria-labelledby="observation-data-title">
             <p>OBSERVATION DATA</p>
             <h2 id="observation-data-title">관측 정보</h2>
             {observationFacts.length > 0 && <dl>{observationFacts.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
             {observation.equipment.length > 0 && <div class="observation-equipment"><strong>사용 장비</strong><p>{observation.equipment.join(' · ')}</p></div>}
             {observation.conditions && <div class="observation-conditions"><strong>관측 조건</strong><p>{observation.conditions}</p></div>}
+            <a class="observation-download" href={`/archive/${post.id}/data.json`} download>관측 데이터 JSON <span aria-hidden="true">↓</span></a>
           </section>
         )}
         <Content />

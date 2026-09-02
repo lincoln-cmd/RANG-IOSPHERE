@@ -48,11 +48,24 @@ const { body: sitemapIndex } = await request('/sitemap-index.xml');
 const childSitemapURL = sitemapIndex.match(/<loc>([^<]+)<\/loc>/)?.[1];
 if (childSitemapURL) {
   const { body: childSitemap } = await request(new URL(childSitemapURL).pathname);
-  const articleURL = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).find((url) => /\/archive\/[^/]+\/$/.test(url));
+  const articleURLs = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).filter((url) => /\/archive\/[^/]+\/$/.test(url));
+  const articleURL = articleURLs[0];
   if (articleURL) {
     const { body: articleBody } = await request(new URL(articleURL).pathname);
     if (!articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
     console.log(`통과  ${new URL(articleURL).pathname}`);
+  }
+  for (const candidateURL of articleURLs) {
+    const { body: articleBody } = await request(new URL(candidateURL).pathname);
+    const dataPath = articleBody.match(/href="([^"]+\/data\.json)"/)?.[1];
+    if (!dataPath) continue;
+    const { response, body } = await request(dataPath);
+    const payload = JSON.parse(body);
+    if (!response.headers.get('content-type')?.includes('application/json') || !payload.observation) {
+      throw new Error(`관측 데이터 다운로드 스모크 테스트 실패: ${dataPath}`);
+    }
+    console.log(`통과  ${dataPath}`);
+    break;
   }
 }
 

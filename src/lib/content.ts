@@ -16,3 +16,11 @@ export const byPublishedDate = (a: PostEntry, b: PostEntry) =>
 
 export const formatDate = (date?: Date) =>
   date ? new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date) : '';
+
+export const hasObservationData = (observation?: PostEntry['data']['observation']) => Boolean(
+  observation && (
+    observation.target || observation.observedAt || observation.location || observation.equipment.length ||
+    observation.conditions || observation.seeing || observation.transparency ||
+    observation.temperatureC !== undefined || observation.humidityPercent !== undefined
+  )
+);

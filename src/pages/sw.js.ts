@@ -1,9 +1,11 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
+import { hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
   const posts = await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt));
   const pages = ['/', '/archive/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
+  const dataFiles = posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : []);
   const media = posts.flatMap((post) => post.data.cover ? [post.data.cover] : []);
   const signature = posts
     .map((post) => `${post.id}:${(post.data.updatedAt ?? post.data.publishedAt)?.toISOString()}`)
@@ -16,7 +18,7 @@ export const GET: APIRoute = async () => {
   const source = `const CACHE_NAME = ${JSON.stringify(cacheName)};
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_PAGES = ${JSON.stringify(pages)};
-const PRECACHE_ASSETS = ${JSON.stringify(['/offline.html', '/manifest.webmanifest', '/favicon.svg', '/icon-192.png', '/icon-512.png', ...media])};
+const PRECACHE_ASSETS = ${JSON.stringify(['/offline.html', '/manifest.webmanifest', '/favicon.svg', '/icon-192.png', '/icon-512.png', ...media, ...dataFiles])};
 
 const cachePageAndAssets = async (cache, path) => {
   const response = await fetch(path, { cache: 'reload' });
