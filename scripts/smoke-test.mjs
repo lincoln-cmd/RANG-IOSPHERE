@@ -45,6 +45,12 @@ for (const [path, marker] of checks) {
   console.log(`통과  ${path}`);
 }
 
+const { response: csvResponse, body: csvBody } = await request('/observations/data.csv');
+if (!csvResponse.headers.get('content-type')?.includes('text/csv') || !csvBody.includes('observedDate,target,equipment')) {
+  throw new Error('전체 관측 데이터 CSV 스모크 테스트 실패');
+}
+console.log('통과  /observations/data.csv');
+
 const { body: sitemapIndex } = await request('/sitemap-index.xml');
 const childSitemapURL = sitemapIndex.match(/<loc>([^<]+)<\/loc>/)?.[1];
 if (childSitemapURL) {

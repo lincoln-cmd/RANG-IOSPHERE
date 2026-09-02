@@ -49,13 +49,31 @@ const datasetStructuredData = {
         </div>
       </div>
       {records.length ? (
+        <>
+        <div class="observations-tools" aria-label="관측 기록 검색과 정렬">
+          <label class="observations-search">
+            <span>SEARCH RECORDS</span>
+            <input id="observation-search" type="search" placeholder="대상·제목·장비 검색" autocomplete="off" />
+          </label>
+          <label class="observations-sort">
+            <span>SORT BY</span>
+            <select id="observation-sort">
+              <option value="newest">최신 관측순</option>
+              <option value="oldest">오래된 관측순</option>
+              <option value="target">대상 이름순</option>
+            </select>
+          </label>
+          <p class="observations-result" aria-live="polite"><strong>{records.length}</strong>개 기록</p>
+        </div>
         <div class="observations-table-wrap">
           <table>
             <thead><tr><th>관측일</th><th>대상</th><th>장비</th><th>시상 / 투명도</th><th>기온 / 습도</th><th><span class="sr-only">기록 이동</span></th></tr></thead>
             <tbody>
               {records.map((post) => {
                 const observation = post.data.observation!;
-                return <tr>
+                const sortDate = observation.observedAt ?? post.data.publishedAt;
+                const searchText = [observation.target, post.data.title, ...observation.equipment].filter(Boolean).join(' ').toLocaleLowerCase('ko-KR');
+                return <tr data-search={searchText} data-time={sortDate?.getTime() ?? 0} data-target={(observation.target ?? post.data.title).toLocaleLowerCase('ko-KR')}>
                   <td data-label="관측일">{formatDate(observation.observedAt ?? post.data.publishedAt)}</td>
                   <td data-label="대상"><strong>{observation.target ?? post.data.title}</strong><small>{post.data.title}</small></td>
                   <td data-label="장비">{observation.equipment.length ? observation.equipment.join(' · ') : '—'}</td>
@@ -67,6 +85,8 @@ const datasetStructuredData = {
             </tbody>
           </table>
         </div>
+        <div class="observations-no-results" hidden><span aria-hidden="true">Ø</span><div><strong>일치하는 관측 기록이 없습니다.</strong><p>검색어를 줄이거나 다른 대상·장비 이름을 입력해 보세요.</p></div></div>
+        </>
       ) : (
         <div class="observations-empty"><span aria-hidden="true">Ø</span><div><strong>아직 공개된 관측 데이터가 없습니다.</strong><p>관측 정보가 포함된 일지를 공개하면 이곳에 자동으로 집계됩니다.</p></div></div>
       )}
@@ -74,3 +94,34 @@ const datasetStructuredData = {
   </main>
   <SiteFooter />
 </BaseLayout>
+
+<script is:inline>
+  const searchInput = document.querySelector<HTMLInputElement>('#observation-search');
+  const sortSelect = document.querySelector<HTMLSelectElement>('#observation-sort');
+  const tableWrap = document.querySelector<HTMLElement>('.observations-table-wrap');
+  const tableBody = tableWrap?.querySelector<HTMLTableSectionElement>('tbody');
+  const result = document.querySelector<HTMLElement>('.observations-result');
+  const noResults = document.querySelector<HTMLElement>('.observations-no-results');
+  const rows = tableBody ? [...tableBody.querySelectorAll('tr')] : [];
+
+  const updateRecords = () => {
+    const query = searchInput?.value.trim().toLocaleLowerCase('ko-KR') ?? '';
+    const order = sortSelect?.value ?? 'newest';
+    const visibleRows = rows.filter((row) => row.dataset.search?.includes(query));
+
+    visibleRows.sort((a, b) => {
+      if (order === 'oldest') return Number(a.dataset.time) - Number(b.dataset.time);
+      if (order === 'target') return (a.dataset.target ?? '').localeCompare(b.dataset.target ?? '', 'ko-KR');
+      return Number(b.dataset.time) - Number(a.dataset.time);
+    });
+
+    rows.forEach((row) => { row.hidden = !visibleRows.includes(row); });
+    visibleRows.forEach((row) => tableBody?.append(row));
+    if (result) result.innerHTML = `<strong>${visibleRows.length}</strong>개 기록`;
+    if (tableWrap) tableWrap.hidden = visibleRows.length === 0;
+    if (noResults) noResults.hidden = visibleRows.length !== 0;
+  };
+
+  searchInput?.addEventListener('input', updateRecords);
+  sortSelect?.addEventListener('change', updateRecords);
+</script>
