@@ -216,7 +216,7 @@ const articleStructuredData = {
       const code = pre.querySelector('code');
       if (!code) return;
       const languageClass = [...code.classList].find((className) => className.startsWith('language-'));
-      const language = languageClass ? languageClass.slice('language-'.length) : 'code';
+      const language = pre.dataset.language || (languageClass ? languageClass.slice('language-'.length) : 'code');
       const toolbar = document.createElement('div');
       toolbar.className = 'code-toolbar';
       const label = document.createElement('span');
