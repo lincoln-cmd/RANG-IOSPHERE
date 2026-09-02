@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#060914" />
+    <title>연결 대기 중 | 랑이오스페어</title>
+    <style>
+      :root{color-scheme:dark}*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#060914;color:#eef2f8;font-family:system-ui,sans-serif}.panel{width:min(100%,620px);padding:44px;border:1px solid #2d3749;background:#090f1c}.mark{width:52px;height:52px;display:grid;place-items:center;margin-bottom:56px;border:1px solid #b8ff5a;border-radius:50%;color:#b8ff5a;font:600 20px monospace}.eyebrow{color:#b8ff5a;font:11px monospace;letter-spacing:.14em}h1{margin:18px 0;font-size:clamp(34px,8vw,64px);line-height:1.08;letter-spacing:-.04em}p{max-width:480px;color:#a9b5c8;line-height:1.8}button{margin-top:28px;padding:12px 18px;border:1px solid #b8ff5a;color:#b8ff5a;background:transparent;font-weight:700;cursor:pointer}button:hover,button:focus-visible{color:#061006;background:#b8ff5a;outline:none}@media(max-width:520px){.panel{padding:30px}.mark{margin-bottom:42px}}
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <div class="mark" aria-hidden="true">R</div>
+      <p class="eyebrow">SIGNAL TEMPORARILY LOST</p>
+      <h1>관측 신호를<br />기다리는 중입니다.</h1>
+      <p>현재 네트워크에 연결할 수 없습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요. 이전에 열어 본 기록은 오프라인에서도 표시될 수 있습니다.</p>
+      <button type="button" onclick="location.reload()">다시 연결하기</button>
+    </main>
+  </body>
+</html>

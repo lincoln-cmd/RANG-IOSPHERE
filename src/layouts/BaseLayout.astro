@@ -31,7 +31,11 @@ const serializedStructuredData = structuredData ? JSON.stringify(structuredData)
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#060914" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="랑이오스페어" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="랑이오스페어 RSS" href={rssURL} />
@@ -51,5 +55,10 @@ const serializedStructuredData = structuredData ? JSON.stringify(structuredData)
   </head>
   <body>
     <slot />
+    <script is:inline>
+      if ('serviceWorker' in navigator && !window.location.pathname.startsWith('/admin')) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+      }
+    </script>
   </body>
 </html>
