@@ -64,6 +64,7 @@ const datasetStructuredData = {
             </select>
           </label>
           <p class="observations-result" aria-live="polite"><strong>{records.length}</strong>개 기록</p>
+          <button class="observations-reset" type="button" hidden>초기화</button>
         </div>
         <div class="observations-table-wrap">
           <table>
@@ -102,9 +103,20 @@ const datasetStructuredData = {
   const tableBody = tableWrap?.querySelector<HTMLTableSectionElement>('tbody');
   const result = document.querySelector<HTMLElement>('.observations-result');
   const noResults = document.querySelector<HTMLElement>('.observations-no-results');
+  const resetButton = document.querySelector<HTMLButtonElement>('.observations-reset');
   const rows = tableBody ? [...tableBody.querySelectorAll('tr')] : [];
+  const allowedSorts = new Set(['newest', 'oldest', 'target']);
 
-  const updateRecords = () => {
+  const syncURL = () => {
+    const url = new URL(window.location.href);
+    const query = searchInput?.value.trim() ?? '';
+    const order = sortSelect?.value ?? 'newest';
+    query ? url.searchParams.set('q', query) : url.searchParams.delete('q');
+    order === 'newest' ? url.searchParams.delete('sort') : url.searchParams.set('sort', order);
+    history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  };
+
+  const updateRecords = (updateURL = true) => {
     const query = searchInput?.value.trim().toLocaleLowerCase('ko-KR') ?? '';
     const order = sortSelect?.value ?? 'newest';
     const visibleRows = rows.filter((row) => row.dataset.search?.includes(query));
@@ -120,8 +132,27 @@ const datasetStructuredData = {
     if (result) result.innerHTML = `<strong>${visibleRows.length}</strong>개 기록`;
     if (tableWrap) tableWrap.hidden = visibleRows.length === 0;
     if (noResults) noResults.hidden = visibleRows.length !== 0;
+    if (resetButton) resetButton.hidden = query.length === 0 && order === 'newest';
+    if (updateURL) syncURL();
   };
 
-  searchInput?.addEventListener('input', updateRecords);
-  sortSelect?.addEventListener('change', updateRecords);
+  searchInput?.addEventListener('input', () => updateRecords());
+  sortSelect?.addEventListener('change', () => updateRecords());
+  resetButton?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    if (sortSelect) sortSelect.value = 'newest';
+    updateRecords();
+    searchInput?.focus();
+  });
+
+  const restoreFromURL = () => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedSort = params.get('sort') ?? 'newest';
+    if (searchInput) searchInput.value = params.get('q') ?? '';
+    if (sortSelect) sortSelect.value = allowedSorts.has(requestedSort) ? requestedSort : 'newest';
+    updateRecords(false);
+  };
+
+  window.addEventListener('popstate', restoreFromURL);
+  restoreFromURL();
 </script>

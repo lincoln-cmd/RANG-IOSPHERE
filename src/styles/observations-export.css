@@ -31,7 +31,7 @@
 .observations-tools {
   margin-bottom: 24px;
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(170px, auto) auto;
+  grid-template-columns: minmax(220px, 1fr) minmax(170px, auto) auto auto;
   gap: 14px;
   align-items: end;
 }
@@ -74,6 +74,28 @@
 .observations-result strong {
   color: var(--accent);
   font-size: 14px;
+}
+
+.observations-reset {
+  min-height: 34px;
+  margin-bottom: 4px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  color: #aeb7c6;
+  background: transparent;
+  font: 9px 'Noto Sans KR';
+  cursor: pointer;
+}
+
+.observations-reset:hover,
+.observations-reset:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.observations-reset[hidden] {
+  display: none;
 }
 
 .observations-no-results {
@@ -122,5 +144,10 @@
   .observations-result {
     margin: 0;
     text-align: left;
+  }
+
+  .observations-reset {
+    width: max-content;
+    margin: 0;
   }
 }
