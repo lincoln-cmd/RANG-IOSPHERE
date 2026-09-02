@@ -4,7 +4,7 @@ import { hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
   const posts = await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt));
-  const pages = ['/', '/archive/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
+  const pages = ['/', '/archive/', '/observations/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
   const dataFiles = posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : []);
   const media = posts.flatMap((post) => post.data.cover ? [post.data.cover] : []);
   const signature = posts

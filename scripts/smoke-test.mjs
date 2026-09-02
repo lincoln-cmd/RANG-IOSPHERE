@@ -33,6 +33,7 @@ const checks = [
   ['/', '랑이와 함께 보는'],
   ['/about/', '밤하늘을 관측하고'],
   ['/archive/', '관측과 탐구의 기록'],
+  ['/observations/', '관측 데이터 현황'],
   ['/admin/', 'RANG-IOSPHERE CMS'],
   ['/rss.xml', '<rss'],
   ['/sitemap-index.xml', '<sitemapindex'],

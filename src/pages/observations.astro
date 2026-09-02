@@ -1,0 +1,71 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { formatDate, hasObservationData } from '../lib/content';
+import '../styles/observations.css';
+
+const records = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt) && hasObservationData(data.observation)))
+  .sort((a, b) => (b.data.observation?.observedAt?.getTime() ?? b.data.publishedAt?.getTime() ?? 0) - (a.data.observation?.observedAt?.getTime() ?? a.data.publishedAt?.getTime() ?? 0));
+const targets = new Set(records.flatMap((post) => post.data.observation?.target ? [post.data.observation.target] : []));
+const equipment = new Set(records.flatMap((post) => post.data.observation?.equipment ?? []));
+const latestObservation = records.find((post) => post.data.observation?.observedAt)?.data.observation?.observedAt;
+const datasetStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: '랑이오스페어 공개 관측 데이터',
+  description: '직접 수행한 천체 관측 기록에서 공개한 관측 대상, 장비 및 환경 수치',
+  url: new URL('/observations/', Astro.site ?? Astro.url).href,
+  creator: { '@type': 'Person', name: '김동훈' },
+  inLanguage: 'ko-KR',
+  temporalCoverage: records.length ? `${records.at(-1)?.data.observation?.observedAt?.toISOString() ?? ''}/${latestObservation?.toISOString() ?? ''}` : undefined,
+  variableMeasured: ['관측 대상', '사용 장비', '시상', '투명도', '기온', '습도'],
+};
+---
+<BaseLayout title="관측 데이터 현황 | 랑이오스페어" description="랑이오스페어에 공개된 천체 관측 대상, 장비와 환경 수치를 한눈에 확인합니다" structuredData={datasetStructuredData}>
+  <SiteHeader compact />
+  <main class="observations-page">
+    <header class="observations-hero">
+      <p class="eyebrow">OBSERVATION DATASET · PUBLIC RECORDS</p>
+      <h1>관측 데이터 현황</h1>
+      <p>공개한 관측일지에서 관측 대상과 장비, 환경 수치를 모아 봅니다. 장소와 정확한 관측 시각은 이 요약 데이터에서 제외합니다.</p>
+      <dl>
+        <div><dt>RECORDS</dt><dd>{String(records.length).padStart(2, '0')}</dd></div>
+        <div><dt>TARGETS</dt><dd>{String(targets.size).padStart(2, '0')}</dd></div>
+        <div><dt>EQUIPMENT</dt><dd>{String(equipment.size).padStart(2, '0')}</dd></div>
+        <div><dt>LATEST</dt><dd>{latestObservation ? formatDate(latestObservation) : '—'}</dd></div>
+      </dl>
+    </header>
+
+    <section class="observations-ledger" aria-labelledby="ledger-title">
+      <div class="observations-heading">
+        <div><p class="eyebrow">FIELD DATA LEDGER</p><h2 id="ledger-title">공개 관측 기록</h2></div>
+        <p>각 행의 원문에서 관측 과정과 해석을 확인하고, 기술 데이터는 JSON으로 내려받을 수 있습니다.</p>
+      </div>
+      {records.length ? (
+        <div class="observations-table-wrap">
+          <table>
+            <thead><tr><th>관측일</th><th>대상</th><th>장비</th><th>시상 / 투명도</th><th>기온 / 습도</th><th><span class="sr-only">기록 이동</span></th></tr></thead>
+            <tbody>
+              {records.map((post) => {
+                const observation = post.data.observation!;
+                return <tr>
+                  <td>{formatDate(observation.observedAt ?? post.data.publishedAt)}</td>
+                  <td><strong>{observation.target ?? post.data.title}</strong><small>{post.data.title}</small></td>
+                  <td>{observation.equipment.length ? observation.equipment.join(' · ') : '—'}</td>
+                  <td>{observation.seeing ?? '—'} <span>/</span> {observation.transparency ?? '—'}</td>
+                  <td>{observation.temperatureC === undefined ? '—' : `${observation.temperatureC} °C`} <span>/</span> {observation.humidityPercent === undefined ? '—' : `${observation.humidityPercent}%`}</td>
+                  <td><a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 원문 보기`}>원문 ↗</a><a href={`/archive/${post.id}/data.json`} download aria-label={`${post.data.title} 관측 데이터 JSON 다운로드`}>JSON ↓</a></td>
+                </tr>;
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div class="observations-empty"><span aria-hidden="true">Ø</span><div><strong>아직 공개된 관측 데이터가 없습니다.</strong><p>관측 정보가 포함된 일지를 공개하면 이곳에 자동으로 집계됩니다.</p></div></div>
+      )}
+    </section>
+  </main>
+  <SiteFooter />
+</BaseLayout>
