@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
-  const appCacheVersion = '2026-09-03-mobile-layout-2';
+  const appCacheVersion = '2026-09-03-mobile-cards-3';
   const posts = await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt));
   const pages = ['/', '/archive/', '/observations/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
   const dataFiles = posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : []);

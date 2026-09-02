@@ -5,6 +5,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { formatDate, hasObservationData } from '../lib/content';
 import '../styles/observations.css';
+import '../styles/observations-mobile.css';
 
 const records = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt) && hasObservationData(data.observation)))
   .sort((a, b) => (b.data.observation?.observedAt?.getTime() ?? b.data.publishedAt?.getTime() ?? 0) - (a.data.observation?.observedAt?.getTime() ?? a.data.publishedAt?.getTime() ?? 0));
@@ -51,12 +52,12 @@ const datasetStructuredData = {
               {records.map((post) => {
                 const observation = post.data.observation!;
                 return <tr>
-                  <td>{formatDate(observation.observedAt ?? post.data.publishedAt)}</td>
-                  <td><strong>{observation.target ?? post.data.title}</strong><small>{post.data.title}</small></td>
-                  <td>{observation.equipment.length ? observation.equipment.join(' · ') : '—'}</td>
-                  <td>{observation.seeing ?? '—'} <span>/</span> {observation.transparency ?? '—'}</td>
-                  <td>{observation.temperatureC === undefined ? '—' : `${observation.temperatureC} °C`} <span>/</span> {observation.humidityPercent === undefined ? '—' : `${observation.humidityPercent}%`}</td>
-                  <td><a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 원문 보기`}>원문 ↗</a><a href={`/archive/${post.id}/data.json`} download aria-label={`${post.data.title} 관측 데이터 JSON 다운로드`}>JSON ↓</a></td>
+                  <td data-label="관측일">{formatDate(observation.observedAt ?? post.data.publishedAt)}</td>
+                  <td data-label="대상"><strong>{observation.target ?? post.data.title}</strong><small>{post.data.title}</small></td>
+                  <td data-label="장비">{observation.equipment.length ? observation.equipment.join(' · ') : '—'}</td>
+                  <td data-label="시상 / 투명도">{observation.seeing ?? '—'} <span>/</span> {observation.transparency ?? '—'}</td>
+                  <td data-label="기온 / 습도">{observation.temperatureC === undefined ? '—' : `${observation.temperatureC} °C`} <span>/</span> {observation.humidityPercent === undefined ? '—' : `${observation.humidityPercent}%`}</td>
+                  <td data-label="자료"><a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 원문 보기`}>원문 ↗</a><a href={`/archive/${post.id}/data.json`} download aria-label={`${post.data.title} 관측 데이터 JSON 다운로드`}>JSON ↓</a></td>
                 </tr>;
               })}
             </tbody>

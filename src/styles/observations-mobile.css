@@ -1,0 +1,100 @@
+@media (max-width: 900px) {
+  .observations-page,
+  .observations-hero,
+  .observations-ledger {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .observations-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    contain: none;
+    border: 0;
+  }
+
+  .observations-table-wrap table,
+  .observations-table-wrap tbody,
+  .observations-table-wrap tr,
+  .observations-table-wrap td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .observations-table-wrap table {
+    table-layout: fixed;
+    background: transparent;
+  }
+
+  .observations-table-wrap thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .observations-table-wrap tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 18px;
+    border: 1px solid var(--line);
+    background: #090e1a;
+  }
+
+  .observations-table-wrap td {
+    min-height: 82px;
+    padding: 34px 15px 15px;
+    position: relative;
+    overflow-wrap: anywhere;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .observations-table-wrap td:nth-child(even) {
+    border-right: 0;
+  }
+
+  .observations-table-wrap td:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .observations-table-wrap td::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 13px;
+    left: 15px;
+    color: #778397;
+    font: 8px 'IBM Plex Mono';
+    letter-spacing: .08em;
+  }
+
+  .observations-table-wrap td:last-child {
+    display: flex;
+    align-items: center;
+    padding-top: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .observations-table-wrap tr {
+    grid-template-columns: 1fr;
+  }
+
+  .observations-table-wrap td,
+  .observations-table-wrap td:nth-child(even),
+  .observations-table-wrap td:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .observations-table-wrap td:last-child {
+    border-bottom: 0;
+  }
+}
