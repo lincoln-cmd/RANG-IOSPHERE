@@ -3,14 +3,15 @@ import type { APIRoute } from 'astro';
 import { hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
+  const appCacheVersion = '2026-09-03-mobile-layout-2';
   const posts = await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt));
   const pages = ['/', '/archive/', '/observations/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
   const dataFiles = posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : []);
   const media = posts.flatMap((post) => post.data.cover ? [post.data.cover] : []);
-  const signature = posts
+  const signature = `${appCacheVersion}|${posts
     .map((post) => `${post.id}:${(post.data.updatedAt ?? post.data.publishedAt)?.toISOString()}`)
     .sort()
-    .join('|');
+    .join('|')}`;
   let hash = 5381;
   for (const character of signature) hash = ((hash << 5) + hash) ^ character.charCodeAt(0);
   const cacheName = `rang-iosphere-${(hash >>> 0).toString(36)}`;
