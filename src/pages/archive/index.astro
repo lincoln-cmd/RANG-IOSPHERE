@@ -38,6 +38,13 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
           <button type="button" data-category-filter={key} aria-pressed="false">{category.label}</button>
         ))}
       </div>
+      <div class="archive-sort">
+        <label for="archive-sort">정렬</label>
+        <select id="archive-sort">
+          <option value="newest">최신순</option>
+          <option value="oldest">오래된순</option>
+        </select>
+      </div>
       <div class="archive-result-wrap"><p class="archive-result" aria-live="polite"><strong>{posts.length}</strong>개의 공개 기록</p><button class="archive-clear" type="button" hidden>필터 초기화</button></div>
     </section>
 
@@ -50,7 +57,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
             {categoryPosts.length ? (
               <div class="post-list">
                 {categoryPosts.map((post) => (
-                  <article data-archive-post data-search={`${post.data.title} ${post.data.description} ${post.data.series ?? ''} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')} data-series={(post.data.series ?? '').toLocaleLowerCase('ko')}>
+                  <article data-archive-post data-published={post.data.publishedAt?.getTime() ?? 0} data-search={`${post.data.title} ${post.data.description} ${post.data.series ?? ''} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')} data-series={(post.data.series ?? '').toLocaleLowerCase('ko')}>
                     {post.data.cover && <a class="post-cover" href={`/archive/${post.id}/`} tabindex="-1" aria-hidden="true"><img src={post.data.cover} alt="" loading="lazy" decoding="async" /></a>}
                     <p>{formatDate(post.data.publishedAt)}</p>
                     <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
@@ -77,6 +84,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
 
   <script is:inline>
     const queryInput = document.querySelector('#archive-query');
+    const sortSelect = document.querySelector('#archive-sort');
     const filterButtons = [...document.querySelectorAll('[data-category-filter]')];
     const groups = [...document.querySelectorAll('[data-category]')];
     const result = document.querySelector('.archive-result');
@@ -85,6 +93,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
     let selectedCategory = 'all';
     let selectedTag = '';
     let selectedSeries = '';
+    let selectedSort = 'newest';
 
     const normalize = (value) => value.trim().toLocaleLowerCase('ko');
     const allowedCategories = filterButtons.map((item) => item.dataset.categoryFilter);
@@ -94,7 +103,9 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       selectedCategory = allowedCategories.includes(category) ? category : 'all';
       selectedTag = normalize(params.get('tag') || '');
       selectedSeries = normalize(params.get('series') || '');
+      selectedSort = params.get('sort') === 'oldest' ? 'oldest' : 'newest';
       if (queryInput) queryInput.value = params.get('q') || '';
+      if (sortSelect) sortSelect.value = selectedSort;
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.categoryFilter === selectedCategory)));
     };
     const writeURLState = (mode = 'replace') => {
@@ -104,6 +115,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       if (selectedTag) params.set('tag', selectedTag);
       if (selectedSeries) params.set('series', selectedSeries);
       if (selectedCategory !== 'all') params.set('category', selectedCategory);
+      if (selectedSort === 'oldest') params.set('sort', selectedSort);
       const url = `${window.location.pathname}${params.size ? `?${params}` : ''}${window.location.hash}`;
       window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
     };
@@ -114,6 +126,12 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       groups.forEach((group) => {
         const categoryMatches = selectedCategory === 'all' || group.dataset.category === selectedCategory;
         const posts = [...group.querySelectorAll('[data-archive-post]')];
+        const postList = group.querySelector('.post-list');
+        posts.sort((a, b) => {
+          const difference = Number(b.dataset.published || 0) - Number(a.dataset.published || 0);
+          return selectedSort === 'oldest' ? -difference : difference;
+        });
+        if (postList) posts.forEach((post) => postList.append(post));
         let visibleInGroup = 0;
 
         posts.forEach((post) => {
@@ -138,11 +156,12 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
         if (selectedSeries) { const series = document.createElement('span'); series.textContent = selectedSeries; result.append(series, ' 연재 · '); }
         const count = document.createElement('strong'); count.textContent = String(visibleTotal); result.append(count, '개의 공개 기록');
       }
-      if (clearButton) clearButton.hidden = !query && !selectedTag && !selectedSeries && selectedCategory === 'all';
+      if (clearButton) clearButton.hidden = !query && !selectedTag && !selectedSeries && selectedCategory === 'all' && selectedSort === 'newest';
       if (noResults) noResults.hidden = (!query && !selectedTag && !selectedSeries) || visibleTotal > 0;
     };
 
     queryInput?.addEventListener('input', () => { selectedTag = ''; selectedSeries = ''; writeURLState(); applyArchiveFilters(); });
+    sortSelect?.addEventListener('change', () => { selectedSort = sortSelect.value === 'oldest' ? 'oldest' : 'newest'; writeURLState('push'); applyArchiveFilters(); });
     filterButtons.forEach((button) => button.addEventListener('click', () => {
       selectedCategory = button.dataset.categoryFilter;
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
@@ -150,7 +169,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean
       applyArchiveFilters();
     }));
     clearButton?.addEventListener('click', () => {
-      selectedCategory = 'all'; selectedTag = ''; selectedSeries = ''; if (queryInput) queryInput.value = '';
+      selectedCategory = 'all'; selectedTag = ''; selectedSeries = ''; selectedSort = 'newest'; if (queryInput) queryInput.value = ''; if (sortSelect) sortSelect.value = selectedSort;
       filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.categoryFilter === 'all')));
       writeURLState('push'); applyArchiveFilters();
     });
