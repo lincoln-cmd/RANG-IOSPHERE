@@ -1,11 +1,13 @@
 {
   "name": "랑이오스페어 · RANG-IOSPHERE",
   "short_name": "랑이오스페어",
+  "id": "/",
   "description": "관측하고, 비교하고, 기록하는 개인 천체관측 아카이브",
   "lang": "ko-KR",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "prefer_related_applications": false,
   "background_color": "#060914",
   "theme_color": "#060914",
   "categories": ["education", "science", "lifestyle"],
