@@ -11,6 +11,7 @@ import 'katex/dist/katex.min.css';
 import '../../styles/math.css';
 import '../../styles/image-viewer.css';
 import '../../styles/code-tools.css';
+import '../../styles/print.css';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
@@ -74,6 +75,7 @@ const articleStructuredData = {
       <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL}>
         <button type="button" data-copy-link>링크 복사 <span aria-hidden="true">↗</span></button>
         <button type="button" data-native-share hidden>공유 <span aria-hidden="true">↗</span></button>
+        <button type="button" data-print-article>인쇄 · PDF <span aria-hidden="true">↗</span></button>
         <p role="status" aria-live="polite"></p>
       </div>
     </header>
@@ -163,6 +165,7 @@ const articleStructuredData = {
     const actions = document.querySelector('.article-actions');
     const copyButton = actions?.querySelector('[data-copy-link]');
     const shareButton = actions?.querySelector('[data-native-share]');
+    const printButton = actions?.querySelector('[data-print-article]');
     const shareStatus = actions?.querySelector('[role="status"]');
     const shareURL = actions?.dataset.shareUrl || window.location.href;
     const setShareStatus = (message) => {
@@ -186,6 +189,7 @@ const articleStructuredData = {
         }
       });
     }
+    printButton?.addEventListener('click', () => window.print());
 
     const imageViewer = document.querySelector('dialog.image-viewer');
     const viewerImage = imageViewer?.querySelector('img');

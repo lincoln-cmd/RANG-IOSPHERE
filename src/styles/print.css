@@ -1,0 +1,33 @@
+@media print {
+  @page { size:A4; margin:18mm 16mm 20mm; }
+  :root { color-scheme:light; }
+  html { scroll-behavior:auto; }
+  body { background:#fff!important; color:#111!important; }
+  .site-header,.site-footer,.reading-progress,.article-actions,.article-toc,.series-panel,.post-navigation,.related-posts,.image-viewer { display:none!important; }
+  .article-page { width:auto; min-height:0; background:#fff!important; }
+  .article-hero { padding:0 0 14mm!important; border-bottom:1px solid #999; background:none!important; }
+  .article-hero .back-link { display:none; }
+  .article-hero .eyebrow,.article-meta,.article-tags { color:#333!important; }
+  .article-hero h1 { max-width:none; color:#000!important; font-size:28pt!important; line-height:1.25; }
+  .article-hero>p { max-width:none; color:#222!important; }
+  .article-tags a { color:#222!important; text-decoration:none; }
+  .article-cover { margin:10mm 0!important; break-inside:avoid; }
+  .article-cover img { max-height:150mm; object-fit:contain; }
+  .article-cover figcaption { color:#444!important; }
+  .article-shell { display:block!important; width:auto!important; padding:0!important; }
+  .prose { max-width:none!important; color:#111!important; font-size:10.5pt!important; line-height:1.75!important; }
+  .prose h2,.prose h3 { break-after:avoid; color:#000!important; }
+  .prose h2 { margin-top:12mm!important; }
+  .prose p,.prose li { orphans:3; widows:3; }
+  .prose a { color:#000!important; text-decoration:underline; }
+  .prose blockquote,.observation-card,.article-references { break-inside:avoid; border-color:#777!important; background:#f4f4f4!important; color:#111!important; }
+  .prose table,.prose pre,.prose img { break-inside:avoid; }
+  .prose th,.prose td { border-color:#777!important; }
+  .prose .code-toolbar { border-color:#777!important; background:#eee!important; color:#222!important; }
+  .prose .code-toolbar button { display:none; }
+  .prose pre { white-space:pre-wrap; border-color:#777!important; background:#f4f4f4!important; color:#111!important; }
+  .prose :not(pre)>code { border-color:#aaa!important; background:#eee!important; color:#111!important; }
+  .prose .katex,.prose .katex-display { color:#000!important; }
+  .prose .katex-display { border-color:#aaa!important; background:#fff!important; }
+  .article-references a::after { content:' (' attr(href) ')'; font-size:8pt; overflow-wrap:anywhere; }
+}
