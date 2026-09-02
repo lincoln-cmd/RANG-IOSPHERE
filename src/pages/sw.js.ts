@@ -3,10 +3,10 @@ import type { APIRoute } from 'astro';
 import { hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
-  const appCacheVersion = '2026-09-03-mobile-cards-3';
+  const appCacheVersion = '2026-09-03-observations-csv-4';
   const posts = await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt));
   const pages = ['/', '/archive/', '/observations/', '/about/', ...posts.map((post) => `/archive/${post.id}/`)];
-  const dataFiles = posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : []);
+  const dataFiles = ['/observations/data.csv', ...posts.flatMap((post) => hasObservationData(post.data.observation) ? [`/archive/${post.id}/data.json`] : [])];
   const media = posts.flatMap((post) => post.data.cover ? [post.data.cover] : []);
   const signature = `${appCacheVersion}|${posts
     .map((post) => `${post.id}:${(post.data.updatedAt ?? post.data.publishedAt)?.toISOString()}`)

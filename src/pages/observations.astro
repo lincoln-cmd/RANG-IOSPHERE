@@ -5,6 +5,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { formatDate, hasObservationData } from '../lib/content';
 import '../styles/observations.css';
+import '../styles/observations-export.css';
 import '../styles/observations-mobile.css';
 
 const records = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt) && hasObservationData(data.observation)))
@@ -42,7 +43,10 @@ const datasetStructuredData = {
     <section class="observations-ledger" aria-labelledby="ledger-title">
       <div class="observations-heading">
         <div><p class="eyebrow">FIELD DATA LEDGER</p><h2 id="ledger-title">공개 관측 기록</h2></div>
-        <p>각 행의 원문에서 관측 과정과 해석을 확인하고, 기술 데이터는 JSON으로 내려받을 수 있습니다.</p>
+        <div class="observations-heading-summary">
+          <p>각 기록의 원문과 개별 JSON을 확인하거나, 공개된 관측값 전체를 CSV로 내려받을 수 있습니다.</p>
+          {records.length > 0 && <a class="dataset-download" href="/observations/data.csv" download>전체 데이터 CSV <span aria-hidden="true">↓</span></a>}
+        </div>
       </div>
       {records.length ? (
         <div class="observations-table-wrap">

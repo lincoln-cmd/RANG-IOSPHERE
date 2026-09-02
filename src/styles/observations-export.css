@@ -1,0 +1,36 @@
+.observations-heading-summary {
+  max-width: 520px;
+}
+
+.observations-heading-summary p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.dataset-download {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 20px;
+  padding: 11px 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid var(--line);
+  color: var(--accent);
+  font: 10px 'IBM Plex Mono';
+}
+
+.dataset-download:hover,
+.dataset-download:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+@media (max-width: 560px) {
+  .dataset-download {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
