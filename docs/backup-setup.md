@@ -29,6 +29,14 @@ git remote add bitbucket https://bitbucket.org/lincoln_kim/rang-iosphere.git
 
 ## 수동 백업 실행
 
+권장 명령은 다음과 같습니다. 작업 트리가 깨끗하고 GitHub `main`과 동일하며, `Quality checks`와 `Deployment smoke test`가 모두 성공한 경우에만 두 백업 저장소로 전송합니다.
+
+```powershell
+pnpm backup:verified
+```
+
+검사를 직접 확인한 뒤 개별 명령으로 백업하려면 다음을 사용합니다.
+
 ```powershell
 git push gitlab main:backup-main
 git push bitbucket main:backup-main
@@ -54,3 +62,16 @@ git rev-parse main
 ```
 
 두 원격의 SHA가 로컬 `main` SHA와 같으면 백업이 완료된 것입니다. 인증 토큰이나 비밀번호는 문서와 커밋에 기록하지 않습니다.
+
+## 복구 연습
+
+기존 작업 폴더를 덮어쓰지 말고 별도의 임시 폴더에 백업 저장소를 복제해 확인합니다.
+
+```powershell
+git clone --branch backup-main https://gitlab.com/lincoln-cmd/rang-iosphere.git rang-iosphere-restore-test
+cd rang-iosphere-restore-test
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+GitLab을 사용할 수 없으면 Bitbucket 주소로 동일하게 확인합니다. 빌드가 성공하고 주요 파일과 게시물이 존재하면 복구 가능한 백업입니다. 확인용 폴더 삭제는 경로를 다시 확인한 뒤 별도로 진행합니다.

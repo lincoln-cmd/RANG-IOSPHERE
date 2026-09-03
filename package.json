@@ -10,6 +10,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "new:post": "node scripts/new-post.mjs",
+    "backup:verified": "node scripts/backup-verified.mjs",
     "smoke:test": "node scripts/smoke-test.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "prepublish:check": "pnpm validate:content --strict && pnpm check && pnpm build:site"
