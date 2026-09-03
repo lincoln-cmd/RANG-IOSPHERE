@@ -36,6 +36,7 @@ const checks = [
   ['/observations/', '관측 데이터 현황'],
   ['/admin/', 'RANG-IOSPHERE CMS'],
   ['/rss.xml', '<rss'],
+  ['/robots.txt', 'Sitemap: https://rang-iosphere.pages.dev/sitemap-index.xml'],
   ['/sitemap-index.xml', '<sitemapindex'],
 ];
 
@@ -43,6 +44,15 @@ for (const [path, marker] of checks) {
   const { body } = await request(path);
   if (!body.includes(marker)) throw new Error(`${path}: 필수 문구를 찾을 수 없습니다: ${marker}`);
   console.log(`통과  ${path}`);
+}
+
+if (process.env.REQUIRE_SEARCH_VERIFICATION === 'true') {
+  const { body: homeBody } = await request('/');
+  for (const provider of ['google', 'naver']) {
+    const pattern = new RegExp(`<meta\\s+name=["']${provider}-site-verification["']\\s+content=["'][^"']+["']`);
+    if (!pattern.test(homeBody)) throw new Error(`${provider} 검색엔진 소유권 인증 태그가 없습니다.`);
+    console.log(`통과  ${provider} 검색엔진 인증 태그`);
+  }
 }
 
 const { response: csvResponse, body: csvBody } = await request('/observations/data.csv');

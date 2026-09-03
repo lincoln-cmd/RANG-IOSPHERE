@@ -41,3 +41,4 @@ jobs:
         env:
           SITE_URL: https://rang-iosphere.pages.dev
           EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || inputs.expected_sha || github.sha }}
+          REQUIRE_SEARCH_VERIFICATION: "true"
