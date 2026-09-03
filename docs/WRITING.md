@@ -69,7 +69,7 @@ observation:
 
 ## 이미지
 
-웹용 이미지는 `public/images/` 아래에 저장하고 Markdown에서 다음처럼 사용합니다.
+웹용 이미지는 `public/images/` 아래에 저장하고 Markdown에서 다음처럼 사용합니다. 빠른 모바일 로딩을 위해 긴 변 기준 1,600px 이하, 파일당 2MB 이하의 WebP 또는 압축 JPEG를 권장합니다.
 
 ```md
 ![이미지 설명](/images/example.jpg)

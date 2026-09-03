@@ -1,4 +1,4 @@
-import { access, readFile, readdir } from 'node:fs/promises';
+import { access, readFile, readdir, stat } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { dirname, extname, relative, resolve } from 'node:path';
 import { parse } from 'yaml';
@@ -67,7 +67,12 @@ for (const file of files) {
     if (!/^(https?:|data:)/.test(data.cover)) {
       const cleanCover = decodeURIComponent(data.cover.split(/[?#]/)[0]);
       const coverPath = cleanCover.startsWith('/') ? resolve(publicDir, cleanCover.slice(1)) : resolve(dirname(file), cleanCover);
-      if (!(await exists(coverPath))) report('error', file, `대표 이미지 파일을 찾을 수 없습니다: ${data.cover}`);
+      if (!(await exists(coverPath))) {
+        report('error', file, `대표 이미지 파일을 찾을 수 없습니다: ${data.cover}`);
+      } else {
+        const { size } = await stat(coverPath);
+        if (size > 2 * 1024 * 1024) report('warning', file, '대표 이미지가 2MB를 초과합니다. 업로드 전에 WebP 또는 압축 JPEG로 최적화하세요.');
+      }
     }
   }
 
