@@ -1,5 +1,11 @@
 ---
 const { compact = false } = Astro.props;
+const pathname = Astro.url.pathname;
+const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
+  if (section === 'home') return pathname === '/';
+  if (section === 'archive') return pathname.startsWith('/archive/');
+  return pathname.startsWith(`/${section}/`);
+};
 ---
 <header class:list={['site-header', { compact }]}>
   <a class="brand" href="/" aria-label="랑이오스페어 홈">
@@ -7,18 +13,18 @@ const { compact = false } = Astro.props;
     <span><strong>랑이오스페어</strong><small>RANG-IOSPHERE</small></span>
   </a>
   <nav aria-label="주요 메뉴">
-    <a href="/#observatory">관측소</a>
-    <a href="/archive/">아카이브</a>
-    <a href="/observations/">관측 데이터</a>
-    <a href="/about/">프로젝트</a>
+    <a href="/#observatory" aria-current={current('home') ? 'page' : undefined}>관측소</a>
+    <a href="/archive/" aria-current={current('archive') ? 'page' : undefined}>아카이브</a>
+    <a href="/observations/" aria-current={current('observations') ? 'page' : undefined}>관측 데이터</a>
+    <a href="/about/" aria-current={current('about') ? 'page' : undefined}>프로젝트</a>
   </nav>
   <details class="mobile-menu">
     <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
     <nav aria-label="모바일 메뉴">
-      <a href="/#observatory"><small>01</small>관측소</a>
-      <a href="/archive/"><small>02</small>아카이브</a>
-      <a href="/observations/"><small>03</small>관측 데이터</a>
-      <a href="/about/"><small>04</small>프로젝트</a>
+      <a href="/#observatory" aria-current={current('home') ? 'page' : undefined}><small>01</small>관측소</a>
+      <a href="/archive/" aria-current={current('archive') ? 'page' : undefined}><small>02</small>아카이브</a>
+      <a href="/observations/" aria-current={current('observations') ? 'page' : undefined}><small>03</small>관측 데이터</a>
+      <a href="/about/" aria-current={current('about') ? 'page' : undefined}><small>04</small>프로젝트</a>
       <a href="/rss.xml"><small>05</small>RSS</a>
     </nav>
   </details>

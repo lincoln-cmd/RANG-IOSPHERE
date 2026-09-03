@@ -64,7 +64,7 @@ const articleStructuredData = {
 ---
 <BaseLayout title={`${post.data.title} | 랑이오스페어`} description={post.data.description} socialImage={post.data.cover ?? null} socialImageAlt={post.data.coverAlt ?? post.data.title} pageType="article" structuredData={articleStructuredData}>
   <SiteHeader compact />
-  <main class="article-page">
+  <main id="main-content" class="article-page" tabindex="-1">
     <div class="reading-progress" role="progressbar" aria-label="본문 읽기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <header class="article-hero">
       <a href="/archive/" class="back-link">← ARCHIVE</a>

@@ -5,7 +5,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 ---
 <BaseLayout title="신호를 찾을 수 없습니다 | 랑이오스페어" description="요청한 페이지를 찾을 수 없습니다" socialImage={null}>
   <SiteHeader compact />
-  <main class="not-found">
+  <main id="main-content" class="not-found" tabindex="-1">
     <div class="lost-signal" aria-hidden="true"><span></span><i></i></div>
     <div class="not-found-copy">
       <p class="eyebrow">ERROR 404 · SIGNAL LOST</p>
