@@ -23,6 +23,8 @@ const resolvedSocialImage = socialImage ? new URL(socialImage, Astro.site ?? Ast
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
 const rssURL = new URL('/rss.xml', Astro.site ?? Astro.url);
 const serializedStructuredData = structuredData ? JSON.stringify(structuredData).replace(/</g, '\\u003c') : null;
+const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+const naverSiteVerification = import.meta.env.PUBLIC_NAVER_SITE_VERIFICATION?.trim();
 ---
 
 <!doctype html>
@@ -31,6 +33,8 @@ const serializedStructuredData = structuredData ? JSON.stringify(structuredData)
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
+    {naverSiteVerification && <meta name="naver-site-verification" content={naverSiteVerification} />}
     <meta name="theme-color" content="#060914" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="랑이오스페어" />

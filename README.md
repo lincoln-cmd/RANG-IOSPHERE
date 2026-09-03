@@ -38,6 +38,8 @@ pnpm build
 
 게시물 작성 방법은 [게시물 작성 가이드](docs/WRITING.md)를 참고하세요. 작성 중인 글은 `draft: true`로 두면 빌드 결과와 아카이브에서 자동으로 제외됩니다.
 
+검색엔진 소유권 확인과 사이트맵 제출은 [검색엔진 등록 가이드](docs/SEARCH-REGISTRATION.md)를 참고하세요.
+
 ```bash
 pnpm new:post          # 대화형 새 초안 생성
 pnpm validate:content # 게시물 검사
