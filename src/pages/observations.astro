@@ -21,8 +21,14 @@ const datasetStructuredData = {
   url: new URL('/observations/', Astro.site ?? Astro.url).href,
   creator: { '@type': 'Person', name: '김동훈' },
   inLanguage: 'ko-KR',
+  isAccessibleForFree: true,
   temporalCoverage: records.length ? `${records.at(-1)?.data.observation?.observedAt?.toISOString() ?? ''}/${latestObservation?.toISOString() ?? ''}` : undefined,
   variableMeasured: ['관측 대상', '사용 장비', '시상', '투명도', '기온', '습도'],
+  distribution: {
+    '@type': 'DataDownload',
+    encodingFormat: 'text/csv',
+    contentUrl: new URL('/observations/data.csv', Astro.site ?? Astro.url).href,
+  },
 };
 ---
 <BaseLayout title="관측 데이터 현황 | 랑이오스페어" description="랑이오스페어에 공개된 천체 관측 대상, 장비와 환경 수치를 한눈에 확인합니다" structuredData={datasetStructuredData}>

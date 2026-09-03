@@ -7,8 +7,33 @@ import { byPublishedDate, categories, formatDate } from '../../lib/content';
 import '../../styles/series.css';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
+const siteURL = Astro.site ?? Astro.url;
+const archiveURL = new URL('/archive/', siteURL).href;
+const archiveStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: '관측과 탐구의 기록',
+    description: '랑이오스페어의 관측일지와 천체관측 탐구 기록',
+    url: archiveURL,
+    inLanguage: 'ko-KR',
+    mainEntity: { '@id': `${archiveURL}#records` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${archiveURL}#records`,
+    numberOfItems: posts.length,
+    itemListElement: posts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: post.data.title,
+      url: new URL(`/archive/${post.id}/`, siteURL).href,
+    })),
+  },
+];
 ---
-<BaseLayout title="아카이브 | 랑이오스페어" description="랑이오스페어의 관측일지와 천체관측 탐구 기록">
+<BaseLayout title="아카이브 | 랑이오스페어" description="랑이오스페어의 관측일지와 천체관측 탐구 기록" structuredData={archiveStructuredData}>
   <SiteHeader compact />
   <main id="main-content" class="archive-page" tabindex="-1">
     <header class="archive-intro">
