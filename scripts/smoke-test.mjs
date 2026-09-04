@@ -64,8 +64,13 @@ const assetPath = homeBodyForHeaders.match(/(?:href|src)=["'](\/_astro\/[^"']+)[
 if (!assetPath) throw new Error('캐시 정책을 확인할 빌드 자산을 찾을 수 없습니다.');
 const { response: assetResponse } = await request(assetPath);
 requireHeader(assetResponse, 'cache-control', ['max-age=31536000', 'immutable']);
-const { response: serviceWorkerResponse } = await request('/sw.js');
+const { response: serviceWorkerResponse, body: serviceWorkerBody } = await request('/sw.js');
 requireHeader(serviceWorkerResponse, 'cache-control', ['no-cache', 'no-store', 'must-revalidate']);
+for (const marker of ["const CACHE_PREFIX = 'rang-iosphere-'", 'const MAX_RUNTIME_ENTRIES = 60', 'key.startsWith(CACHE_PREFIX)']) {
+  if (!serviceWorkerBody.includes(marker)) throw new Error(`/sw.js: 캐시 용량 관리 설정을 찾을 수 없습니다: ${marker}`);
+}
+const precachePages = JSON.parse(serviceWorkerBody.match(/const PRECACHE_PAGES = (\[[^;]+\]);/)?.[1] ?? '[]');
+if (precachePages.length > 34) throw new Error(`/sw.js: 선저장 페이지가 제한을 초과했습니다: ${precachePages.length}`);
 console.log('통과  정적 자산 및 서비스 워커 캐시 정책');
 
 if (process.env.REQUIRE_SEARCH_VERIFICATION === 'true') {
