@@ -42,6 +42,8 @@ pnpm build
 
 검색엔진 소유권 확인과 사이트맵 제출은 [검색엔진 등록 가이드](docs/SEARCH-REGISTRATION.md)를 참고하세요.
 
+의존성 업데이트는 자동 병합하지 않으며 [의존성 업데이트 운영 원칙](docs/DEPENDENCY-UPDATES.md)에 따라 검증 후 반영합니다.
+
 ```bash
 pnpm new:post          # 대화형 새 초안 생성
 pnpm validate:content # 게시물 검사
