@@ -48,5 +48,6 @@ pnpm build
 pnpm new:post          # 대화형 새 초안 생성
 pnpm validate:content # 게시물 검사
 pnpm validate:links   # 빌드 결과의 내부 링크·이미지 검사
+pnpm validate:a11y    # 빌드 결과의 접근성 기본 규칙 검사
 pnpm prepublish:check # 공개 전 엄격 검사와 빌드
 ```
