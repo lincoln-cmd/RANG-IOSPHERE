@@ -169,6 +169,7 @@ const archiveStructuredData = [
         });
 
         const keepEmptyCategory = categoryMatches && !query && !selectedTag && !selectedSeries && posts.length === 0;
+        if (postList) postList.dataset.filtered = String(Boolean(query || selectedTag || selectedSeries || selectedCategory !== 'all'));
         group.hidden = !(visibleInGroup > 0 || keepEmptyCategory);
         const count = group.querySelector('[data-group-count]');
         if (count) count.textContent = String(visibleInGroup).padStart(2, '0');
