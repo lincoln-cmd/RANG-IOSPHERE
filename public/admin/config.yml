@@ -18,7 +18,7 @@ collections:
   - name: "posts"
     label: "천체 관측 아카이브"
     label_singular: "게시물"
-    description: "관측 기록, 장비 사용기, 이론 정리, 시뮬레이션 및 공개 데이터 탐구를 작성합니다."
+    description: "관측 기록과 탐구 내용을 작성합니다. 공개 전에는 발행일, 대표 이미지 설명, 출처, 초안 해제를 확인하세요."
     folder: "src/data/posts"
     create: true
     delete: true
@@ -28,6 +28,11 @@ collections:
     preview_path: "archive/{{slug}}"
     summary: "{{title}} · {{category}} · {{publishedAt}}"
     sortable_fields: ["title", "publishedAt", "updatedAt", "category"]
+    view_filters:
+      - { label: "초안만", field: "draft", pattern: true }
+      - { label: "공개 글만", field: "draft", pattern: false }
+    view_groups:
+      - { label: "분류별 보기", field: "category" }
     fields:
       - label: "제목"
         name: "title"
@@ -73,19 +78,21 @@ collections:
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
+        hint: "기존 글의 내용을 의미 있게 변경했을 때만 입력합니다."
 
       - label: "초안"
         name: "draft"
         widget: "boolean"
         default: true
         required: false
-        hint: "활성화된 글은 사이트에 공개되지 않습니다."
+        hint: "작성 중에는 활성화하세요. 공개 준비가 끝난 뒤 마지막으로 해제합니다."
 
       - label: "대표 글"
         name: "featured"
         widget: "boolean"
         default: false
         required: false
+        hint: "메인 화면에 강조할 글 하나에만 사용합니다. 여러 글을 선택하면 최신 글이 우선됩니다."
 
       - label: "연재"
         name: "series"
@@ -140,7 +147,7 @@ collections:
         required: false
         collapsed: true
         summary: "{{fields.title}}"
-        hint: "이론, 시뮬레이션 및 공개 데이터의 출처를 기록합니다."
+        hint: "이론, 시뮬레이션 및 공개 데이터 글은 자료명과 원문 URL을 반드시 확인합니다."
         fields:
           - { label: "자료명", name: "title", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
@@ -149,4 +156,4 @@ collections:
       - label: "본문"
         name: "body"
         widget: "markdown"
-        hint: "직접 확인한 사실, 해석, 참고한 데이터의 출처를 구분해 기록합니다."
+        hint: "직접 확인한 사실, 개인적인 해석, 참고 자료를 구분해 작성하고 공개 전 미리보기에서 제목·이미지·수식·코드 블록을 확인합니다."

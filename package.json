@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.11.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "pnpm validate:content && pnpm check && pnpm build:site",
+    "build": "pnpm validate:cms && pnpm validate:content && pnpm check && pnpm build:site",
     "build:site": "astro build && node scripts/write-build-info.mjs && pnpm validate:links && pnpm validate:a11y",
     "preview": "astro preview",
     "check": "astro check",
@@ -14,6 +14,7 @@
     "backup:verified": "node scripts/backup-verified.mjs",
     "smoke:test": "node scripts/smoke-test.mjs",
     "validate:a11y": "node scripts/validate-build-accessibility.mjs",
+    "validate:cms": "node scripts/validate-cms-config.mjs",
     "validate:links": "node scripts/validate-build-links.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "prepublish:check": "pnpm validate:content --strict && pnpm check && pnpm build:site"
