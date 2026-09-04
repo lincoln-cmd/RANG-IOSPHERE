@@ -9,6 +9,11 @@ updates:
       timezone: Asia/Seoul
     open-pull-requests-limit: 5
     versioning-strategy: increase-if-necessary
+    ignore:
+      # Astro 메이저 버전은 마이그레이션 작업에서 별도로 검증합니다.
+      - dependency-name: astro
+        update-types:
+          - version-update:semver-major
     groups:
       safe-runtime-updates:
         dependency-type: production
