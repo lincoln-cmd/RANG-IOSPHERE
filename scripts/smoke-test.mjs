@@ -11,6 +11,13 @@ const request = async (path) => {
   return { url, response, body: await response.text() };
 };
 
+const requireHeader = (response, name, expected) => {
+  const value = response.headers.get(name) ?? '';
+  if (!expected.every((token) => value.toLowerCase().includes(token.toLowerCase()))) {
+    throw new Error(`${response.url}: ${name} 응답 헤더가 올바르지 않습니다: ${value || 'missing'}`);
+  }
+};
+
 let deployedCommit;
 for (let attempt = 1; attempt <= attempts; attempt += 1) {
   try {
@@ -45,6 +52,21 @@ for (const [path, marker] of checks) {
   if (!body.includes(marker)) throw new Error(`${path}: 필수 문구를 찾을 수 없습니다: ${marker}`);
   console.log(`통과  ${path}`);
 }
+
+const { response: homeResponse, body: homeBodyForHeaders } = await request('/');
+requireHeader(homeResponse, 'content-security-policy', ["default-src 'self'", "object-src 'none'", "frame-ancestors 'self'"]);
+requireHeader(homeResponse, 'x-content-type-options', ['nosniff']);
+requireHeader(homeResponse, 'referrer-policy', ['strict-origin-when-cross-origin']);
+requireHeader(homeResponse, 'permissions-policy', ['camera=()', 'microphone=()', 'geolocation=()']);
+console.log('통과  기본 보안 응답 헤더');
+
+const assetPath = homeBodyForHeaders.match(/(?:href|src)=["'](\/_astro\/[^"']+)["']/)?.[1];
+if (!assetPath) throw new Error('캐시 정책을 확인할 빌드 자산을 찾을 수 없습니다.');
+const { response: assetResponse } = await request(assetPath);
+requireHeader(assetResponse, 'cache-control', ['max-age=31536000', 'immutable']);
+const { response: serviceWorkerResponse } = await request('/sw.js');
+requireHeader(serviceWorkerResponse, 'cache-control', ['no-cache', 'no-store', 'must-revalidate']);
+console.log('통과  정적 자산 및 서비스 워커 캐시 정책');
 
 if (process.env.REQUIRE_SEARCH_VERIFICATION === 'true') {
   const { body: homeBody } = await request('/');
