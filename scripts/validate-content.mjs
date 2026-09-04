@@ -71,7 +71,7 @@ for (const file of files) {
         report('error', file, `대표 이미지 파일을 찾을 수 없습니다: ${data.cover}`);
       } else {
         const { size } = await stat(coverPath);
-        if (size > 2 * 1024 * 1024) report('warning', file, '대표 이미지가 2MB를 초과합니다. 업로드 전에 WebP 또는 압축 JPEG로 최적화하세요.');
+        if (size > 1024 * 1024) report('warning', file, '대표 이미지가 1MB를 초과합니다. 업로드 전에 WebP 또는 압축 JPEG로 최적화하세요.');
       }
     }
   }

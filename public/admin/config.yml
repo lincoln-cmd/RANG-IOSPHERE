@@ -98,7 +98,7 @@ collections:
         widget: "image"
         required: false
         choose_url: true
-        hint: "가로형 이미지를 권장합니다. 업로드 파일은 GitHub의 public/uploads에 저장됩니다."
+        hint: "가로형 WebP 또는 압축 JPEG를 권장합니다(권장 1600px 이하, 1MB 이하). 업로드 파일은 GitHub의 public/uploads에 저장됩니다."
 
       - label: "대표 이미지 설명"
         name: "coverAlt"
