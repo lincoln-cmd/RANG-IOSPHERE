@@ -1,10 +1,10 @@
 ---
 title: TTTTTest
-description: TTTTTest
+description: TTTTTestTTTTTestTTTTTestTTTTTestTTTTTestTTTTTestTTTTTestTTTTTest
 category: equipment
 tags:
   - TTTTTest
-publishedAt: 2026-09-12
+publishedAt: 2026-09-05
 draft: false
 featured: false
 observation:
