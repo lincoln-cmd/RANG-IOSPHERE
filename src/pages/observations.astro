@@ -57,11 +57,11 @@ const datasetStructuredData = {
       {records.length ? (
         <>
         <div class="observations-tools" aria-label="관측 기록 검색과 정렬">
-          <label class="observations-search">
+          <label class="observations-search" for="observation-search">
             <span>SEARCH RECORDS</span>
             <input id="observation-search" type="search" placeholder="대상·제목·장비 검색" autocomplete="off" />
           </label>
-          <label class="observations-sort">
+          <label class="observations-sort" for="observation-sort">
             <span>SORT BY</span>
             <select id="observation-sort">
               <option value="newest">최신 관측순</option>
