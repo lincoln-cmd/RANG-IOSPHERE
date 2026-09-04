@@ -39,6 +39,19 @@ const splitDocument = (source) => {
   return { frontmatter: match[1], body: match[2] };
 };
 
+const parseDateOnly = (value) => {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date;
+};
+
+const todayInKorea = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(new Date());
+
 const allFiles = (await walk(postsDir)).filter((file) => ['.md', '.mdx'].includes(extname(file)));
 const knownIds = new Set(allFiles.map((file) => relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '')));
 
@@ -65,6 +78,8 @@ for (const file of files) {
   try { data = parse(document.frontmatter) ?? {}; } catch (error) { report('error', file, `frontmatter YAML 오류: ${error.message}`); continue; }
   const published = data.draft === false;
   const slug = relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '');
+  const publishedDate = data.publishedAt === undefined ? null : parseDateOnly(data.publishedAt);
+  const updatedDate = data.updatedAt === undefined ? null : parseDateOnly(data.updatedAt);
 
   if (!/^[\p{L}\p{N}]+(?:[/-][\p{L}\p{N}]+)*$/u.test(slug)) report('error', file, '파일명은 문자·숫자·하이픈만 사용하세요.');
   for (const field of ['title', 'description', 'category']) if (typeof data[field] !== 'string' || !data[field].trim()) report('error', file, `${field} 값이 비어 있습니다.`);
@@ -72,6 +87,21 @@ for (const file of files) {
   if (!Array.isArray(data.tags)) report('error', file, 'tags는 YAML 배열이어야 합니다.');
   if (typeof data.draft !== 'boolean') report('error', file, 'draft는 true 또는 false여야 합니다.');
   if (published && !data.publishedAt) report('error', file, '공개 글에는 publishedAt이 필요합니다.');
+  if (data.publishedAt !== undefined && !publishedDate) report('error', file, 'publishedAt은 YYYY-MM-DD 형식의 실제 날짜여야 합니다.');
+  if (data.updatedAt !== undefined && !updatedDate) report('error', file, 'updatedAt은 YYYY-MM-DD 형식의 실제 날짜여야 합니다.');
+  if (published && publishedDate && data.publishedAt > todayInKorea) report('error', file, '공개 글의 publishedAt은 미래 날짜일 수 없습니다.');
+  if (publishedDate && updatedDate && updatedDate < publishedDate) report('error', file, 'updatedAt은 publishedAt보다 빠를 수 없습니다.');
+  if (published && typeof data.description === 'string') {
+    const descriptionLength = data.description.replace(/\s+/g, ' ').trim().length;
+    if (descriptionLength < 20) report('warning', file, '검색 설명이 너무 짧습니다. 핵심 내용을 20자 이상으로 요약하세요.');
+    if (descriptionLength > 160) report('warning', file, '검색 설명이 너무 깁니다. 검색 결과를 고려해 160자 이내로 줄이세요.');
+  }
+  if (Array.isArray(data.tags)) {
+    const normalizedTags = data.tags.filter((tag) => typeof tag === 'string').map((tag) => tag.trim());
+    if (normalizedTags.length !== data.tags.length || normalizedTags.some((tag) => !tag)) report('error', file, 'tags에는 비어 있지 않은 문자열만 사용할 수 있습니다.');
+    if (new Set(normalizedTags).size !== normalizedTags.length) report('error', file, '중복된 태그가 있습니다.');
+    if (normalizedTags.some((tag, index) => tag !== data.tags[index])) report('error', file, '태그 앞뒤의 공백을 제거하세요.');
+  }
   if (published && document.body.replace(/<!--([\s\S]*?)-->/g, '').trim().length < 200) report('warning', file, '공개 글의 본문이 매우 짧습니다.');
   const references = Array.isArray(data.references) ? data.references : [];
   if (published && references.length === 0 && !/^##\s+.*(참고|출처|자료)/m.test(document.body)) report('warning', file, '참고 자료 또는 출처를 확인하세요.');
