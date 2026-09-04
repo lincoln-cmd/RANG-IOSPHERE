@@ -1,6 +1,7 @@
 ---
 const { compact = false } = Astro.props;
 const pathname = Astro.url.pathname;
+const currentQuery = pathname.startsWith('/archive/') ? Astro.url.searchParams.get('q') ?? '' : '';
 const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
   if (section === 'home') return pathname === '/';
   if (section === 'archive') return pathname.startsWith('/archive/');
@@ -18,9 +19,20 @@ const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
     <a href="/observations/" aria-current={current('observations') ? 'page' : undefined}>관측 데이터</a>
     <a href="/about/" aria-current={current('about') ? 'page' : undefined}>프로젝트</a>
   </nav>
+  <div class="header-tools">
+    <form class="header-search" action="/archive/" method="get" role="search">
+      <input data-global-search type="search" name="q" value={currentQuery} placeholder="기록 검색" aria-label="전체 기록 검색" autocomplete="off" />
+      <kbd aria-hidden="true">/</kbd>
+    </form>
+    <span class="status"><i></i> OBSERVATORY ONLINE</span>
+  </div>
   <details class="mobile-menu">
     <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
     <nav aria-label="모바일 메뉴">
+      <form class="header-search mobile-search" action="/archive/" method="get" role="search">
+        <input data-global-search type="search" name="q" value={currentQuery} placeholder="기록 검색" aria-label="전체 기록 검색" autocomplete="off" />
+        <button type="submit" aria-label="검색">→</button>
+      </form>
       <a href="/#observatory" aria-current={current('home') ? 'page' : undefined}><small>01</small>관측소</a>
       <a href="/archive/" aria-current={current('archive') ? 'page' : undefined}><small>02</small>아카이브</a>
       <a href="/observations/" aria-current={current('observations') ? 'page' : undefined}><small>03</small>관측 데이터</a>
@@ -28,5 +40,22 @@ const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
       <a href="/rss.xml"><small>05</small>RSS</a>
     </nav>
   </details>
-  <span class="status"><i></i> OBSERVATORY ONLINE</span>
 </header>
+
+<script>
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+    const target = event.target;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || (target instanceof HTMLElement && target.isContentEditable)) return;
+    event.preventDefault();
+
+    const mobile = window.matchMedia('(max-width: 900px)').matches;
+    if (mobile) {
+      const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+      if (menu) menu.open = true;
+      requestAnimationFrame(() => menu?.querySelector<HTMLInputElement>('[data-global-search]')?.focus());
+      return;
+    }
+    document.querySelector<HTMLInputElement>('.header-tools [data-global-search]')?.focus();
+  });
+</script>
