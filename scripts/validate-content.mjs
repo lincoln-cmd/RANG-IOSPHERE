@@ -7,6 +7,13 @@ const root = process.cwd();
 const postsDir = resolve(root, 'src/data/posts');
 const publicDir = resolve(root, 'public');
 const strict = process.argv.includes('--strict');
+const postArgument = process.argv.find((argument) => argument.startsWith('--post='));
+const requestedPost = postArgument
+  ?.slice('--post='.length)
+  .trim()
+  .replace(/\\/g, '/')
+  .replace(/^\/+|\/+$/g, '')
+  .replace(/\.(md|mdx)$/i, '');
 const validCategories = new Set(['observation', 'equipment', 'theory', 'simulation', 'open-data']);
 const errors = [];
 const warnings = [];
@@ -32,8 +39,22 @@ const splitDocument = (source) => {
   return { frontmatter: match[1], body: match[2] };
 };
 
-const files = (await walk(postsDir)).filter((file) => ['.md', '.mdx'].includes(extname(file)));
-const knownIds = new Set(files.map((file) => relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '')));
+const allFiles = (await walk(postsDir)).filter((file) => ['.md', '.mdx'].includes(extname(file)));
+const knownIds = new Set(allFiles.map((file) => relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '')));
+
+if (postArgument && (!requestedPost || requestedPost.split('/').includes('..'))) {
+  console.error('오류  --post에는 src/data/posts 아래의 게시물 파일명만 입력하세요.');
+  process.exit(1);
+}
+
+const files = requestedPost
+  ? allFiles.filter((file) => relative(postsDir, file).replace(/\\/g, '/').replace(/\.(md|mdx)$/, '') === requestedPost)
+  : allFiles;
+
+if (requestedPost && files.length === 0) {
+  console.error(`오류  게시물을 찾을 수 없습니다: ${requestedPost}`);
+  process.exit(1);
+}
 
 for (const file of files) {
   const source = await readFile(file, 'utf8');
