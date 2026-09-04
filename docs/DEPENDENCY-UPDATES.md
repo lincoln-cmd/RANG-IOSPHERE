@@ -18,3 +18,5 @@ Dependabot은 업데이트를 `main`에 직접 반영하지 않고 Pull Request�
 - major 업데이트는 호환성 확인을 위해 개별 제안
 
 자동 병합은 사용하지 않습니다. 테스트가 실패하거나 변경 범위가 불분명한 PR은 병합하지 않고 보류합니다.
+
+Pull Request에서는 운영 Cloudflare 도메인이 해당 PR 커밋으로 배포되지 않으므로 `Deployment smoke test`를 실행하지 않습니다. 이 검사는 검증된 변경이 `main`에 반영된 뒤에만 실행됩니다.

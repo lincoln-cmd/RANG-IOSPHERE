@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows: ["Quality checks"]
     types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       expected_sha:
@@ -20,7 +21,7 @@ concurrency:
 
 jobs:
   smoke:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')
     name: Verify production deployment
     runs-on: ubuntu-latest
     timeout-minutes: 5
