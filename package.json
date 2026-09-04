@@ -18,6 +18,7 @@
     "prepublish:check": "pnpm validate:content --strict && pnpm check && pnpm build:site"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "7.2.0",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "astro": "^6.4.8",
