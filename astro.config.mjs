@@ -3,6 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeImageAttributes from './src/lib/rehype-image-attributes.mjs';
 
 export default defineConfig({
   site: 'https://rang-iosphere.pages.dev',
@@ -21,7 +22,7 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],
-      rehypePlugins: [[rehypeKatex, { strict: false }]],
+      rehypePlugins: [[rehypeKatex, { strict: false }], rehypeImageAttributes],
     }),
   },
 });
