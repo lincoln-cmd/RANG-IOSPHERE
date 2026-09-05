@@ -1,0 +1,9 @@
+.prose .table-scroll { width:100%; max-width:100%; margin:28px 0; overflow-x:auto; overscroll-behavior-inline:contain; border:1px solid var(--line); background:#090f1d; scrollbar-color:var(--accent) #0b1020; }
+.prose .table-scroll:focus-visible { outline:2px solid var(--blue); outline-offset:3px; }
+.prose .table-scroll table { width:100%; min-width:560px; margin:0; border:0; border-collapse:collapse; }
+.prose .table-scroll th { color:var(--ink); background:#10182a; font-size:12px; }
+.prose .table-scroll th,.prose .table-scroll td { padding:13px 15px; border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+.prose .table-scroll th:last-child,.prose .table-scroll td:last-child { border-right:0; }
+.prose .table-scroll tbody tr:last-child td { border-bottom:0; }
+.prose .table-scroll tbody tr:hover { background:rgba(147,183,255,.04); }
+@media (max-width:560px) { .prose .table-scroll { width:calc(100% + 16px); margin:24px -8px; }.prose .table-scroll table { min-width:520px; } }

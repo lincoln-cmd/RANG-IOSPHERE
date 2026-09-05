@@ -22,6 +22,8 @@
   .prose a { color:#000!important; text-decoration:underline; }
   .prose blockquote,.observation-card,.article-references { break-inside:avoid; border-color:#777!important; background:#f4f4f4!important; color:#111!important; }
   .prose table,.prose pre,.prose img { break-inside:avoid; }
+  .prose .table-scroll { overflow:visible!important; border-color:#777!important; background:#fff!important; }
+  .prose .table-scroll table { min-width:0!important; }
   .prose th,.prose td { border-color:#777!important; }
   .prose .code-toolbar { border-color:#777!important; background:#eee!important; color:#222!important; }
   .prose .code-toolbar button { display:none; }
