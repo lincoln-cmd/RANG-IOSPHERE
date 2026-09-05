@@ -3,6 +3,8 @@
 .back-to-top { position:fixed; z-index:25; right:24px; bottom:24px; min-width:64px; height:42px; padding:0 13px; border:1px solid var(--accent); color:var(--accent); background:rgba(6,9,20,.9); box-shadow:0 12px 30px rgba(0,0,0,.32); font:10px 'IBM Plex Mono'; letter-spacing:.08em; cursor:pointer; backdrop-filter:blur(8px); }
 .back-to-top span { margin-right:6px; }
 .back-to-top:hover,.back-to-top:focus-visible { color:#071006; background:var(--accent); outline:none; }
+.back-to-top[hidden] { display:none; }
+.back-to-top-trigger { display:block; width:1px; height:1px; margin-top:-1px; pointer-events:none; }
 .article-toc a { position:relative; display:block; transition:color .18s ease,transform .18s ease; }
 .article-toc a[aria-current="location"] { color:var(--accent); transform:translateX(8px); }
 .article-toc a[aria-current="location"]::before { content:'›'; position:absolute; left:-12px; color:var(--accent); }
