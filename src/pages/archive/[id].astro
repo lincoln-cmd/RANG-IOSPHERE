@@ -44,6 +44,7 @@ const observationFacts = observation ? [
 ].filter((entry): entry is [string, string] => Boolean(entry[1])) : [];
 const articleURL = new URL(`/archive/${post.id}/`, Astro.site ?? Astro.url).href;
 const articleImage = post.data.cover ? new URL(post.data.cover, Astro.site ?? Astro.url).href : undefined;
+const citation = `김동훈. (${formatDate(post.data.publishedAt)}). ${post.data.title}. 랑이오스페어. ${articleURL}`;
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -82,8 +83,9 @@ const breadcrumbStructuredData = {
       <p>{post.data.description}</p>
       <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span><span>약 {readingMinutes}분</span></div>
       <div class="article-tags">{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
-      <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL}>
+      <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL} data-citation={citation}>
         <button type="button" data-copy-link>링크 복사 <span aria-hidden="true">↗</span></button>
+        <button type="button" data-copy-citation>인용 정보 복사 <span aria-hidden="true">↗</span></button>
         <button type="button" data-native-share hidden>공유 <span aria-hidden="true">↗</span></button>
         <button type="button" data-print-article>인쇄 · PDF <span aria-hidden="true">↗</span></button>
         <p role="status" aria-live="polite"></p>
@@ -175,6 +177,7 @@ const breadcrumbStructuredData = {
 
     const actions = document.querySelector('.article-actions');
     const copyButton = actions?.querySelector('[data-copy-link]');
+    const citationButton = actions?.querySelector('[data-copy-citation]');
     const shareButton = actions?.querySelector('[data-native-share]');
     const printButton = actions?.querySelector('[data-print-article]');
     const shareStatus = actions?.querySelector('[role="status"]');
@@ -188,6 +191,13 @@ const breadcrumbStructuredData = {
         await navigator.clipboard.writeText(shareURL);
         setShareStatus('게시물 링크를 복사했습니다.');
       } catch { setShareStatus('링크를 복사하지 못했습니다. 주소창에서 직접 복사해 주세요.'); }
+    });
+    citationButton?.addEventListener('click', async () => {
+      try {
+        if (!navigator.clipboard?.writeText || !actions?.dataset.citation) throw new Error('clipboard unavailable');
+        await navigator.clipboard.writeText(actions.dataset.citation);
+        setShareStatus('인용 정보를 복사했습니다.');
+      } catch { setShareStatus('인용 정보를 복사하지 못했습니다.'); }
     });
     if (shareButton && navigator.share) {
       shareButton.hidden = false;

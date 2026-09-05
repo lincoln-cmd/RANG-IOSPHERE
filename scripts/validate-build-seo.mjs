@@ -83,6 +83,11 @@ for (const htmlFile of htmlFiles) {
     const breadcrumb = structuredData.find((item) => item?.['@type'] === 'BreadcrumbList');
     if (!article || article.url !== canonical || article.mainEntityOfPage !== canonical || !article.headline || !article.datePublished) report('BlogPosting 구조화 데이터가 불완전합니다.');
     if (!breadcrumb || breadcrumb.itemListElement?.at(-1)?.item !== canonical) report('BreadcrumbList 구조화 데이터가 불완전합니다.');
+    const actions = html.match(/<div\b[^>]*\bclass=["'][^"']*\barticle-actions\b[^"']*["'][^>]*>/i)?.[0];
+    const citation = actions ? decode(attr(actions, 'data-citation')) : undefined;
+    if (!/<button\b[^>]*data-copy-citation/i.test(html) || !citation?.includes(article?.headline) || !citation?.includes(canonical)) {
+      report('게시물 인용 정보가 없거나 제목·주소가 일치하지 않습니다.');
+    }
   }
 }
 
