@@ -212,6 +212,34 @@ const breadcrumbStructuredData = {
     }
     printButton?.addEventListener('click', () => window.print());
 
+    const chemistryText = (formula) => {
+      const math = formula.querySelector('.katex-mathml math');
+      const expression = math?.querySelector('semantics > :first-child');
+      if (!expression) return '';
+      const cleanExpression = expression.cloneNode(true);
+      if (!(cleanExpression instanceof Element)) return '';
+      cleanExpression.querySelectorAll('mphantom').forEach((node) => node.remove());
+      return (cleanExpression.textContent || '').replaceAll('\u200b', '').trim();
+    };
+    document.addEventListener('copy', (event) => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || !event.clipboardData) return;
+      const range = selection.getRangeAt(0).cloneRange();
+      const closestFormula = (node) => (node instanceof Element ? node : node.parentElement)?.closest('.katex');
+      const startFormula = closestFormula(range.startContainer);
+      const endFormula = closestFormula(range.endContainer);
+      if (startFormula) range.setStartBefore(startFormula);
+      if (endFormula) range.setEndAfter(endFormula);
+      const fragment = range.cloneContents();
+      const chemistryFormulas = [...fragment.querySelectorAll('.katex')].filter((formula) =>
+        formula.querySelector('annotation')?.textContent?.trim().startsWith('\\ce{'),
+      );
+      if (!chemistryFormulas.length) return;
+      chemistryFormulas.forEach((formula) => formula.replaceWith(document.createTextNode(chemistryText(formula))));
+      event.clipboardData.setData('text/plain', (fragment.textContent || '').replaceAll('\u200b', ''));
+      event.preventDefault();
+    });
+
     const imageViewer = document.querySelector('dialog.image-viewer');
     const viewerImage = imageViewer?.querySelector('img');
     const viewerCaption = imageViewer?.querySelector('figcaption');
