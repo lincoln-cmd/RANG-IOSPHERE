@@ -9,8 +9,20 @@ const walk = (directory) => readdirSync(directory, { withFileTypes: true }).flat
   return entry.isDirectory() ? walk(path) : [path];
 });
 const htmlFiles = walk(outputDirectory).filter((path) => extname(path) === '.html');
+const cssFiles = walk(outputDirectory).filter((path) => extname(path) === '.css');
 const failures = [];
 let checkedControls = 0;
+
+const hasReducedMotionBundle = cssFiles.some((path) => {
+  const css = readFileSync(path, 'utf8');
+  const start = css.search(/@media\s*\(prefers-reduced-motion:\s*reduce\)/i);
+  if (start < 0) return false;
+  const rule = css.slice(start, start + 500);
+  return rule.includes('animation:none!important')
+    && rule.includes('transition:none!important')
+    && rule.includes('scroll-behavior:auto');
+});
+if (!hasReducedMotionBundle) failures.push('CSS: 동작 줄이기 환경의 애니메이션·전환·스크롤 중지 규칙이 없습니다.');
 
 const hasAttribute = (attributes, name) => new RegExp(`\\s${name}(?:\\s*=|\\s|$)`, 'i').test(` ${attributes}`);
 const attributeValue = (attributes, name) => attributes.match(new RegExp(`\\s${name}\\s*=\\s*["']([^"']*)["']`, 'i'))?.[1];
@@ -65,7 +77,7 @@ for (const htmlFile of htmlFiles) {
   if (duplicates.length) report(source, `중복 id: ${duplicates.join(', ')}`);
 }
 
-console.log(`빌드 접근성 검사: HTML ${htmlFiles.length}개, 조작 요소 ${checkedControls}개`);
+console.log(`빌드 접근성 검사: HTML ${htmlFiles.length}개, CSS ${cssFiles.length}개, 조작 요소 ${checkedControls}개`);
 if (failures.length) {
   failures.forEach((failure) => console.error(`오류  ${failure}`));
   throw new Error(`접근성 기본 규칙 위반 ${failures.length}개`);
