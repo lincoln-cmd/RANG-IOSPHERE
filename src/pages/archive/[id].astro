@@ -172,11 +172,22 @@ const breadcrumbStructuredData = {
     };
     addEventListener('scroll', requestProgressUpdate, { passive: true });
     addEventListener('resize', requestProgressUpdate);
+    document.addEventListener('scroll', requestProgressUpdate, { passive: true });
+    window.visualViewport?.addEventListener('scroll', requestProgressUpdate, { passive: true });
+    window.visualViewport?.addEventListener('resize', requestProgressUpdate);
+    addEventListener('pageshow', () => {
+      requestProgressUpdate();
+      requestAnimationFrame(requestProgressUpdate);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') requestProgressUpdate();
+    });
     tocLinks.forEach((link) => link.addEventListener('click', () => {
       tocLinks.forEach((item) => item.removeAttribute('aria-current'));
       link.setAttribute('aria-current', 'location');
     }));
     updateReadingProgress();
+    requestAnimationFrame(requestProgressUpdate);
     backToTop?.addEventListener('click', () => {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
