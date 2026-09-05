@@ -107,7 +107,10 @@ for (const file of files) {
   if (published && references.length === 0 && !/^##\s+.*(참고|출처|자료)/m.test(document.body)) report('warning', file, '참고 자료 또는 출처를 확인하세요.');
   for (const reference of references) {
     if (typeof reference?.title !== 'string' || !reference.title.trim()) report('error', file, '참고 자료의 자료명이 비어 있습니다.');
-    try { new URL(reference?.url); } catch { report('error', file, `참고 자료 URL이 올바르지 않습니다: ${reference?.url ?? ''}`); }
+    try {
+      const referenceURL = new URL(reference?.url);
+      if (!['http:', 'https:'].includes(referenceURL.protocol)) throw new Error('unsupported protocol');
+    } catch { report('error', file, `참고 자료 URL은 올바른 HTTP(S) 주소여야 합니다: ${reference?.url ?? ''}`); }
   }
   if (data.category === 'observation' && !data.observation) report('warning', file, '관측일지에는 observation 정보 추가를 권장합니다.');
 

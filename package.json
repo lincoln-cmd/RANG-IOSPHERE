@@ -16,6 +16,7 @@
     "validate:a11y": "node scripts/validate-build-accessibility.mjs",
     "validate:cms": "node scripts/validate-cms-config.mjs",
     "validate:links": "node scripts/validate-build-links.mjs",
+    "validate:references": "node scripts/validate-references.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "prepublish:check": "node scripts/prepublish-check.mjs"
   },
