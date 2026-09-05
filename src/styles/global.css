@@ -23,7 +23,7 @@ nav a[aria-current="page"] { color:var(--accent); }
 .header-search kbd { position:absolute; top:9px; right:9px; min-width:17px; padding:1px 4px; border:1px solid var(--line); color:var(--muted); font:9px 'IBM Plex Mono'; text-align:center; pointer-events:none; }
 .mobile-search { width:auto; margin:12px; display:flex; border:1px solid var(--line); }
 .mobile-search input { height:42px; border:0; }.mobile-search button { width:44px; border:0; border-left:1px solid var(--line); color:var(--accent); background:#0a0f1c; cursor:pointer; }
-.status { color:var(--muted); font:10px 'IBM Plex Mono'; letter-spacing:.08em; white-space:nowrap; }.status i { display:inline-block; width:6px; height:6px; margin-right:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 10px var(--accent); }
+.status { color:var(--muted); font:10px 'IBM Plex Mono'; letter-spacing:.08em; white-space:nowrap; }.status i { display:inline-block; width:6px; height:6px; margin-right:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 10px var(--accent); }.status.offline { color:#c1a77d; }.status.offline i { background:#e5a85c; box-shadow:0 0 10px rgba(229,168,92,.65); }.mobile-connection { display:none; }
 .hero { position:relative; min-height:calc(100vh - 86px); display:grid; grid-template-columns:.8fr 1.2fr; align-items:center; padding:5vw 4vw 7vw; overflow:hidden; }
 .hero::before { content:''; position:absolute; inset:0; opacity:.2; pointer-events:none; background-image:radial-gradient(circle,#fff 0 1px,transparent 1.5px); background-size:91px 91px; }
 .hero-copy { position:relative; z-index:2; padding-left:4vw; }
@@ -73,3 +73,4 @@ body .observations-page { width:100%; max-width:100%; overflow-x:hidden; }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation:none!important; transition:none!important; } }
 @media (max-width:1100px) { .header-tools .status { display:none; } }
 @media (max-width:900px) { .site-header>.header-tools { display:none; } }
+@media (max-width:900px) { .mobile-menu .mobile-connection { min-height:42px; padding:0 18px; display:flex; align-items:center; border-top:1px solid var(--line); } }

@@ -24,7 +24,7 @@ const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
       <input data-global-search type="search" name="q" value={currentQuery} placeholder="기록 검색" aria-label="전체 기록 검색" autocomplete="off" />
       <kbd aria-hidden="true">/</kbd>
     </form>
-    <span class="status"><i></i> OBSERVATORY ONLINE</span>
+    <span class="status" role="status" aria-live="polite" data-connection-status><i></i><span>OBSERVATORY ONLINE</span></span>
   </div>
   <details class="mobile-menu">
     <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
@@ -38,11 +38,25 @@ const current = (section: 'home' | 'archive' | 'observations' | 'about') => {
       <a href="/observations/" aria-current={current('observations') ? 'page' : undefined}><small>03</small>관측 데이터</a>
       <a href="/about/" aria-current={current('about') ? 'page' : undefined}><small>04</small>프로젝트</a>
       <a href="/rss.xml"><small>05</small>RSS</a>
+      <span class="mobile-connection status" role="status" aria-live="polite" data-connection-status><i></i><span>OBSERVATORY ONLINE</span></span>
     </nav>
   </details>
 </header>
 
 <script>
+  const updateConnectionStatus = () => {
+    const online = navigator.onLine;
+    document.querySelectorAll<HTMLElement>('[data-connection-status]').forEach((status) => {
+      status.classList.toggle('offline', !online);
+      const label = status.querySelector('span');
+      if (label) label.textContent = online ? 'OBSERVATORY ONLINE' : 'ARCHIVE OFFLINE';
+    });
+  };
+  window.addEventListener('online', updateConnectionStatus);
+  window.addEventListener('offline', updateConnectionStatus);
+  window.addEventListener('pageshow', updateConnectionStatus);
+  updateConnectionStatus();
+
   document.addEventListener('keydown', (event) => {
     if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
     const target = event.target;
