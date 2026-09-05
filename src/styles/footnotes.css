@@ -1,0 +1,10 @@
+.prose [data-footnote-ref] { color:var(--accent); font:9px 'IBM Plex Mono'; text-decoration:none; }
+.prose [data-footnote-ref]:hover { text-decoration:underline; }
+.prose [data-footnotes] { margin-top:72px; padding-top:28px; border-top:1px solid var(--line); color:#9ea8b8; font-size:12px; }
+.prose [data-footnotes]::before { content:'NOTES'; display:block; margin-bottom:20px; color:var(--accent); font:9px 'IBM Plex Mono'; letter-spacing:.16em; }
+.prose [data-footnotes] ol { margin:0; padding-left:24px; }
+.prose [data-footnotes] li { padding-left:6px; }
+.prose [data-footnotes] li::marker { color:var(--accent); font-family:'IBM Plex Mono'; }
+.prose [data-footnotes] p { margin:10px 0; }
+.prose [data-footnote-backref] { margin-left:6px; color:var(--accent); text-decoration:none; }
+.prose [data-footnote-backref]:hover { text-decoration:underline; }

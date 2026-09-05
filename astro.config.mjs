@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/contrib/mhchem';
 import rehypeImageAttributes from './src/lib/rehype-image-attributes.mjs';
+import rehypeLocalizeFootnotes from './src/lib/rehype-localize-footnotes.mjs';
 
 export default defineConfig({
   site: 'https://rang-iosphere.pages.dev',
@@ -23,7 +24,7 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],
-      rehypePlugins: [[rehypeKatex, { strict: false }], rehypeImageAttributes],
+      rehypePlugins: [[rehypeKatex, { strict: false }], rehypeImageAttributes, rehypeLocalizeFootnotes],
     }),
   },
 });
