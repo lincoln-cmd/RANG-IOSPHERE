@@ -3,7 +3,7 @@
   :root { color-scheme:light; }
   html { scroll-behavior:auto; }
   body { background:#fff!important; color:#111!important; }
-  .site-header,.site-footer,.reading-progress,.article-actions,.article-toc,.series-panel,.post-navigation,.related-posts,.image-viewer,.observation-download { display:none!important; }
+  .site-header,.site-footer,.reading-progress,.back-to-top,.article-actions,.article-toc,.series-panel,.post-navigation,.related-posts,.image-viewer,.observation-download { display:none!important; }
   .article-page { width:auto; min-height:0; background:#fff!important; }
   .article-hero { padding:0 0 14mm!important; border-bottom:1px solid #999; background:none!important; }
   .article-hero .back-link { display:none; }
