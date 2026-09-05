@@ -7,3 +7,6 @@ confirmModulesPurge: false
 allowBuilds:
   esbuild: true
   sharp: true
+
+overrides:
+  rehype-katex>katex: 0.18.5
