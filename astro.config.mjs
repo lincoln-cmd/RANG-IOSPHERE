@@ -3,6 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import 'katex/contrib/mhchem';
 import rehypeImageAttributes from './src/lib/rehype-image-attributes.mjs';
 
 export default defineConfig({

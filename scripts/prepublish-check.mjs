@@ -28,6 +28,7 @@ const runPnpm = (args) => run(process.execPath, [pnpmCli, ...args]);
 console.log(`공개 전 검사 대상: ${post}`);
 run('node', ['scripts/validate-cms-config.mjs']);
 run('node', ['scripts/validate-content.mjs', '--strict', `--post=${post}`]);
+run('node', ['scripts/validate-math.mjs']);
 runPnpm(['check']);
 runPnpm(['build:site']);
 console.log(`공개 전 검사 완료: ${post}`);
