@@ -76,7 +76,7 @@ const breadcrumbStructuredData = {
   <SiteHeader compact />
   <main id="main-content" class="article-page" tabindex="-1">
     <div class="reading-progress" role="progressbar" aria-label="본문 읽기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
-    <button class="back-to-top" type="button" aria-label="페이지 맨 위로 이동" hidden><span aria-hidden="true">↑</span> TOP</button>
+    <button class="back-to-top" type="button" aria-label="페이지 맨 위로 이동"><span aria-hidden="true">↑</span> TOP</button>
     <header class="article-hero">
       <a href="/archive/" class="back-link">← ARCHIVE</a>
       <p class="eyebrow">{category.index} · {category.en}</p>
@@ -162,7 +162,6 @@ const breadcrumbStructuredData = {
       const value = Math.round(Math.min(100, Math.max(0, ((window.scrollY - start) / Math.max(1, end - start)) * 100)));
       progress.style.setProperty('--reading-progress', `${value}%`);
       progress.setAttribute('aria-valuenow', String(value));
-      if (backToTop) backToTop.hidden = window.scrollY < 640;
       updateActiveHeading();
     };
     const requestProgressUpdate = () => {
