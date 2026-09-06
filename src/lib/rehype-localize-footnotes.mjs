@@ -1,7 +1,37 @@
 export default function rehypeLocalizeFootnotes() {
   return (tree) => {
+    const calloutLabels = {
+      NOTE: '참고',
+      TIP: '관측 팁',
+      IMPORTANT: '중요',
+      WARNING: '주의',
+      CAUTION: '위험',
+    };
     const visit = (node) => {
       if (node?.type === 'element') {
+        if (node.tagName === 'blockquote') {
+          const firstParagraph = node.children?.find((child) => child?.type === 'element' && child.tagName === 'p');
+          const firstText = firstParagraph?.children?.[0];
+          const calloutType = firstText?.type === 'text'
+            ? firstText.value.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\r?\n|\s+)/i)?.[1]?.toUpperCase()
+            : undefined;
+          if (calloutType) {
+            const label = calloutLabels[calloutType];
+            firstText.value = firstText.value.replace(/^\[![A-Z]+\](?:\r?\n|\s+)/i, '');
+            node.tagName = 'aside';
+            node.properties = {
+              ...node.properties,
+              className: ['article-callout', `article-callout-${calloutType.toLowerCase()}`],
+              ariaLabel: label,
+            };
+            node.children.unshift({
+              type: 'element',
+              tagName: 'p',
+              properties: { className: ['article-callout-label'] },
+              children: [{ type: 'text', value: label }],
+            });
+          }
+        }
         if (node.tagName === 'h2' && node.properties?.id === 'footnote-label') {
           node.children = [{ type: 'text', value: '각주' }];
         }

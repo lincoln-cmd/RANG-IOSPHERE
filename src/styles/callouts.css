@@ -1,0 +1,10 @@
+.prose .article-callout { --callout-color:var(--blue); position:relative; margin:28px 0; padding:20px 22px 20px 24px; border:1px solid var(--line); border-color:color-mix(in srgb,var(--callout-color) 45%,var(--line)); border-left:3px solid var(--callout-color); background:#0b1222; background:color-mix(in srgb,var(--callout-color) 7%,#090f1d); color:var(--body); }
+.prose .article-callout::before { content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg,color-mix(in srgb,var(--callout-color) 8%,transparent),transparent 45%); }
+.prose .article-callout>* { position:relative; }
+.prose .article-callout-label { margin:0 0 9px; color:var(--callout-color); font:700 11px/1.4 'IBM Plex Mono',monospace; letter-spacing:.12em; text-transform:uppercase; }
+.prose .article-callout>p:last-child { margin-bottom:0; }
+.prose .article-callout-tip { --callout-color:var(--accent); }
+.prose .article-callout-important { --callout-color:#b5a6ff; }
+.prose .article-callout-warning { --callout-color:#ffbf69; }
+.prose .article-callout-caution { --callout-color:#ff7b86; }
+@media (max-width:560px) { .prose .article-callout { margin:24px 0; padding:18px 17px 18px 19px; } }
