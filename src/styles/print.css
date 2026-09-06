@@ -14,6 +14,7 @@
   .article-cover { margin:10mm 0!important; break-inside:avoid; }
   .article-cover img { max-height:150mm; object-fit:contain; }
   .article-cover figcaption { color:#444!important; }
+  .prose .markdown-figure figcaption { color:#444!important; }
   .article-shell { display:block!important; width:auto!important; padding:0!important; }
   .prose { max-width:none!important; color:#111!important; font-size:10.5pt!important; line-height:1.75!important; }
   .prose h2,.prose h3 { break-after:avoid; color:#000!important; }

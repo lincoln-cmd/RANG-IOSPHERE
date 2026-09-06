@@ -279,7 +279,8 @@ const breadcrumbStructuredData = {
       if (typeof imageViewer.showModal !== 'function') { window.open(image.currentSrc || image.src, '_blank', 'noopener'); return; }
       viewerImage.src = image.currentSrc || image.src;
       viewerImage.alt = image.alt;
-      if (viewerCaption) { viewerCaption.textContent = image.alt; viewerCaption.hidden = !image.alt; }
+      const visibleCaption = image.closest('figure')?.querySelector('figcaption')?.textContent?.trim() || image.alt;
+      if (viewerCaption) { viewerCaption.textContent = visibleCaption; viewerCaption.hidden = !visibleCaption; }
       imageViewer.showModal();
     };
     viewableImages.forEach((image) => {
