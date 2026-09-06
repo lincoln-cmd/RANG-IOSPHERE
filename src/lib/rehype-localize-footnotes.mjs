@@ -9,6 +9,9 @@ export default function rehypeLocalizeFootnotes() {
     };
     const visit = (node) => {
       if (node?.type === 'element') {
+        if (node.tagName === 'h2' || node.tagName === 'h3') {
+          node.properties = { ...node.properties, dataSectionLink: true };
+        }
         if (node.tagName === 'blockquote') {
           const firstParagraph = node.children?.find((child) => child?.type === 'element' && child.tagName === 'p');
           const firstText = firstParagraph?.children?.[0];

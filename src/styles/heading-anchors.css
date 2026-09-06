@@ -1,0 +1,7 @@
+.prose h2,.prose h3 { scroll-margin-top:110px; }
+.prose .heading-anchor { display:inline-grid; width:32px; height:32px; margin-left:8px; place-items:center; color:var(--accent); font:500 14px/1 'IBM Plex Mono',monospace; text-decoration:none; opacity:0; transform:translateY(-1px); transition:opacity .18s ease,color .18s ease; }
+.prose h2:hover .heading-anchor,.prose h3:hover .heading-anchor,.prose .heading-anchor:focus-visible { opacity:1; }
+.prose .heading-anchor:hover { color:var(--ink); }
+.prose .heading-anchor:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+@media (max-width:760px) { .prose .heading-anchor { opacity:.72; } }
+@media (prefers-reduced-motion:reduce) { .prose .heading-anchor { transition:none; } }

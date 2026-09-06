@@ -12,6 +12,7 @@ import '../../styles/math.css';
 import '../../styles/footnotes.css';
 import '../../styles/tables.css';
 import '../../styles/callouts.css';
+import '../../styles/heading-anchors.css';
 import '../../styles/image-viewer.css';
 import '../../styles/code-tools.css';
 import '../../styles/print.css';
@@ -147,6 +148,16 @@ const breadcrumbStructuredData = {
     const backToTop = document.querySelector('.back-to-top');
     const backToTopTrigger = document.querySelector('.back-to-top-trigger');
     const tocLinks = [...document.querySelectorAll('.article-toc a[href^="#"]')];
+    document.querySelectorAll('.prose h2[data-section-link][id], .prose h3[data-section-link][id]').forEach((heading) => {
+      if (heading.querySelector('.heading-anchor')) return;
+      const anchor = document.createElement('a');
+      anchor.className = 'heading-anchor';
+      anchor.href = `#${heading.id}`;
+      anchor.textContent = '#';
+      anchor.setAttribute('aria-label', '이 단락 바로가기');
+      anchor.title = '이 단락 바로가기';
+      heading.append(anchor);
+    });
     const tocHeadings = tocLinks.map((link) => {
       const href = link.getAttribute('href') || '';
       try { return document.getElementById(decodeURIComponent(href.slice(1))); } catch { return null; }
