@@ -98,6 +98,13 @@ if (childSitemapURL) {
     const { body: articleBody } = await request(new URL(articleURL).pathname);
     if (!articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
     console.log(`통과  ${new URL(articleURL).pathname}`);
+    const sourcePath = articleBody.match(/href="([^"]+\/source\.md)"/)?.[1];
+    if (!sourcePath) throw new Error(`게시물 Markdown 다운로드 링크가 없습니다: ${articleURL}`);
+    const { response: sourceResponse, body: sourceBody } = await request(sourcePath);
+    if (!sourceResponse.headers.get('content-type')?.includes('text/markdown') || !sourceBody.startsWith('---\n') || !sourceBody.includes('\ntitle: ')) {
+      throw new Error(`게시물 Markdown 다운로드 스모크 테스트 실패: ${sourcePath}`);
+    }
+    console.log(`통과  ${sourcePath}`);
   }
   for (const candidateURL of articleURLs) {
     const { body: articleBody } = await request(new URL(candidateURL).pathname);

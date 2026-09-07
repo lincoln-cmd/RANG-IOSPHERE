@@ -93,6 +93,7 @@ const breadcrumbStructuredData = {
         <button type="button" data-copy-citation>인용 정보 복사 <span aria-hidden="true">↗</span></button>
         <button type="button" data-native-share hidden>공유 <span aria-hidden="true">↗</span></button>
         <button type="button" data-print-article>인쇄 · PDF <span aria-hidden="true">↗</span></button>
+        <a href={`/archive/${post.id}/source.md`} download={`${post.id}.md`}>Markdown 원문 <span aria-hidden="true">↓</span></a>
         <p role="status" aria-live="polite"></p>
       </div>
     </header>
