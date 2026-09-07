@@ -49,6 +49,16 @@ const observationFacts = observation ? [
 const articleURL = new URL(`/archive/${post.id}/`, Astro.site ?? Astro.url).href;
 const articleImage = post.data.cover ? new URL(post.data.cover, Astro.site ?? Astro.url).href : undefined;
 const citation = `김동훈. (${formatDate(post.data.publishedAt)}). ${post.data.title}. 랑이오스페어. ${articleURL}`;
+const bibtexEscape = (value: string) => value.replace(/([#$%&_{}])/g, '\\$1');
+const citationHash = [...post.id].reduce((hash, character) => Math.imul(hash ^ character.charCodeAt(0), 16777619), 2166136261) >>> 0;
+const citationKey = `kim${post.data.publishedAt?.getFullYear() ?? 'nd'}rang${citationHash.toString(36)}`;
+const bibtexCitation = `@online{${citationKey},
+  author = {김동훈},
+  title = {${bibtexEscape(post.data.title)}},
+  year = {${post.data.publishedAt?.getFullYear() ?? ''}},
+  organization = {랑이오스페어},
+  url = {${bibtexEscape(articleURL)}}
+}`;
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -88,9 +98,10 @@ const breadcrumbStructuredData = {
       <p>{post.data.description}</p>
       <div class="article-meta"><span>{formatDate(post.data.publishedAt)}</span>{post.data.updatedAt && <span>수정 {formatDate(post.data.updatedAt)}</span>}<span>{category.label}</span><span>약 {readingMinutes}분</span></div>
       <div class="article-tags">{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
-      <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL} data-citation={citation}>
+      <div class="article-actions" data-share-title={post.data.title} data-share-text={post.data.description} data-share-url={articleURL} data-citation={citation} data-bibtex={bibtexCitation}>
         <button type="button" data-copy-link>링크 복사 <span aria-hidden="true">↗</span></button>
         <button type="button" data-copy-citation>인용 정보 복사 <span aria-hidden="true">↗</span></button>
+        <button type="button" data-copy-bibtex>BibTeX 복사 <span aria-hidden="true">↗</span></button>
         <button type="button" data-native-share hidden>공유 <span aria-hidden="true">↗</span></button>
         <button type="button" data-print-article>인쇄 · PDF <span aria-hidden="true">↗</span></button>
         <a href={`/archive/${post.id}/source.md`} download={`${post.id}.md`}>Markdown 원문 <span aria-hidden="true">↓</span></a>
@@ -220,6 +231,7 @@ const breadcrumbStructuredData = {
     const actions = document.querySelector('.article-actions');
     const copyButton = actions?.querySelector('[data-copy-link]');
     const citationButton = actions?.querySelector('[data-copy-citation]');
+    const bibtexButton = actions?.querySelector('[data-copy-bibtex]');
     const shareButton = actions?.querySelector('[data-native-share]');
     const printButton = actions?.querySelector('[data-print-article]');
     const shareStatus = actions?.querySelector('[role="status"]');
@@ -240,6 +252,13 @@ const breadcrumbStructuredData = {
         await navigator.clipboard.writeText(actions.dataset.citation);
         setShareStatus('인용 정보를 복사했습니다.');
       } catch { setShareStatus('인용 정보를 복사하지 못했습니다.'); }
+    });
+    bibtexButton?.addEventListener('click', async () => {
+      try {
+        if (!navigator.clipboard?.writeText || !actions?.dataset.bibtex) throw new Error('clipboard unavailable');
+        await navigator.clipboard.writeText(actions.dataset.bibtex);
+        setShareStatus('BibTeX 인용 정보를 복사했습니다.');
+      } catch { setShareStatus('BibTeX 인용 정보를 복사하지 못했습니다.'); }
     });
     if (shareButton && navigator.share) {
       shareButton.hidden = false;
