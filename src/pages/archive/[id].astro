@@ -263,6 +263,58 @@ const breadcrumbStructuredData = {
       cleanExpression.querySelectorAll('mphantom').forEach((node) => node.remove());
       return (cleanExpression.textContent || '').replaceAll('\u200b', '').trim();
     };
+    const tableCellText = (cell) => {
+      const copy = cell.cloneNode(true);
+      if (!(copy instanceof Element)) return '';
+      copy.querySelectorAll('.katex').forEach((formula) => {
+        const source = formula.querySelector('annotation')?.textContent?.trim() || '';
+        const value = source.startsWith('\\ce{') && source.endsWith('}') ? source.slice(4, -1) : source;
+        formula.replaceWith(document.createTextNode(value || chemistryText(formula)));
+      });
+      return (copy.textContent || '').replaceAll('\u200b', '').replace(/\s+/g, ' ').trim();
+    };
+    document.querySelectorAll('.prose .table-scroll').forEach((wrapper, index) => {
+      const table = wrapper.querySelector('table');
+      if (!table || wrapper.querySelector('.table-tools')) return;
+      const tableNumber = index + 1;
+      wrapper.setAttribute('aria-label', `표 ${tableNumber}: 좌우로 스크롤할 수 있습니다`);
+      const tools = document.createElement('div');
+      tools.className = 'table-tools';
+      const status = document.createElement('span');
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
+      const copyTableButton = document.createElement('button');
+      copyTableButton.type = 'button';
+      copyTableButton.textContent = '표 복사';
+      copyTableButton.setAttribute('aria-label', `표 ${tableNumber} 복사`);
+      const saveCsvButton = document.createElement('button');
+      saveCsvButton.type = 'button';
+      saveCsvButton.textContent = 'CSV 저장';
+      saveCsvButton.setAttribute('aria-label', `표 ${tableNumber} CSV 저장`);
+      const rows = () => [...table.rows].map((row) => [...row.cells].map(tableCellText));
+      copyTableButton.addEventListener('click', async () => {
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
+          await navigator.clipboard.writeText(rows().map((row) => row.join('\t')).join('\n'));
+          status.textContent = '복사됨';
+        } catch { status.textContent = '복사 실패'; }
+      });
+      saveCsvButton.addEventListener('click', () => {
+        const escapeCsv = (value) => `"${value.replaceAll('"', '""')}"`;
+        const csv = `\uFEFF${rows().map((row) => row.map(escapeCsv).join(',')).join('\r\n')}`;
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const download = document.createElement('a');
+        download.href = url;
+        download.download = `rang-iosphere-table-${tableNumber}.csv`;
+        document.body.append(download);
+        download.click();
+        download.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+        status.textContent = '저장됨';
+      });
+      tools.append(status, copyTableButton, saveCsvButton);
+      wrapper.prepend(tools);
+    });
     document.addEventListener('copy', (event) => {
       const selection = window.getSelection();
       if (!selection || selection.isCollapsed || !event.clipboardData) return;

@@ -97,6 +97,7 @@ if (childSitemapURL) {
   if (articleURL) {
     const { body: articleBody } = await request(new URL(articleURL).pathname);
     if (!articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
+    if (!articleBody.includes('CSV 저장') || !articleBody.includes('표 복사')) throw new Error(`게시물 표 도구 스크립트가 없습니다: ${articleURL}`);
     console.log(`통과  ${new URL(articleURL).pathname}`);
     const sourcePath = articleBody.match(/href="([^"]+\/source\.md)"/)?.[1];
     if (!sourcePath) throw new Error(`게시물 Markdown 다운로드 링크가 없습니다: ${articleURL}`);
