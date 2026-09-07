@@ -27,7 +27,7 @@ const markdownSource = (post: CollectionEntry<'posts'>) => {
     .filter(([, value]) => value !== undefined)
     .map(([key, value]) => `${key}: ${frontmatterValue(value)}`)
     .join('\n');
-  return `---\n${frontmatter}\n---\n\n${post.body.trim()}\n`;
+  return `---\n${frontmatter}\n---\n\n${(post.body ?? '').trim()}\n`;
 };
 
 export const GET: APIRoute = ({ props }) => {
