@@ -74,6 +74,12 @@ const manifest = JSON.parse(manifestBody);
 if (!manifestResponse.headers.get('content-type')?.includes('json') || !manifest.shortcuts?.some((shortcut) => shortcut.url === '/archive/') || !manifest.shortcuts?.some((shortcut) => shortcut.url === '/observations/')) {
   throw new Error('웹앱 manifest 또는 주요 바로가기를 확인할 수 없습니다.');
 }
+
+const { response: rssResponse, body: rssBody } = await request('/rss.xml');
+if (!rssResponse.headers.get('content-type')?.includes('xml') || !rssBody.includes('<atom:link') || !rssBody.includes('<author>') || !rssBody.includes('<category>관측일지</category>')) {
+  throw new Error('RSS 구독 메타데이터를 확인할 수 없습니다.');
+}
+console.log('통과  RSS 구독 메타데이터');
 console.log('통과  웹앱 manifest 및 주요 바로가기');
 
 const assetPath = homeBodyForHeaders.match(/(?:href|src)=["'](\/_astro\/[^"']+)["']/)?.[1];

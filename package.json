@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "pnpm validate:cms && pnpm validate:content && pnpm validate:math && pnpm validate:markdown && pnpm check && pnpm build:site",
-    "build:site": "astro build && node scripts/write-build-info.mjs && pnpm validate:links && pnpm validate:a11y && pnpm validate:images && pnpm validate:seo && pnpm validate:pwa && pnpm validate:performance",
+    "build:site": "astro build && node scripts/write-build-info.mjs && pnpm validate:links && pnpm validate:a11y && pnpm validate:images && pnpm validate:seo && pnpm validate:rss && pnpm validate:pwa && pnpm validate:performance",
     "preview": "astro preview",
     "check": "astro check",
     "new:post": "node scripts/new-post.mjs",
@@ -22,6 +22,7 @@
     "validate:performance": "node scripts/validate-build-performance.mjs",
     "validate:images": "node scripts/validate-build-images.mjs",
     "validate:references": "node scripts/validate-references.mjs",
+    "validate:rss": "node scripts/validate-build-rss.mjs",
     "validate:seo": "node scripts/validate-build-seo.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "prepublish:check": "node scripts/prepublish-check.mjs"

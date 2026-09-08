@@ -55,6 +55,7 @@ pnpm validate:markdown # 각주 등 Markdown 확장 기능 검사
 pnpm validate:pwa      # 웹앱 manifest·아이콘·오프라인 구성 검사
 pnpm validate:performance # HTML·CSS·JS·이미지 크기 예산 검사
 pnpm validate:references # 공개 글의 외부 참고 자료 링크 검사
+pnpm validate:rss       # RSS 항목·분류·대표 이미지 메타데이터 검사
 pnpm validate:seo      # 검색·공유 메타데이터 검사
 pnpm prepublish:check -- 게시물-파일명 # 선택한 글 엄격 검사와 전체 빌드
 ```
