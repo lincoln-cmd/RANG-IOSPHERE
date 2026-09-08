@@ -69,6 +69,13 @@ requireHeader(homeResponse, 'referrer-policy', ['strict-origin-when-cross-origin
 requireHeader(homeResponse, 'permissions-policy', ['camera=()', 'microphone=()', 'geolocation=()']);
 console.log('통과  기본 보안 응답 헤더');
 
+const { response: manifestResponse, body: manifestBody } = await request('/manifest.webmanifest');
+const manifest = JSON.parse(manifestBody);
+if (!manifestResponse.headers.get('content-type')?.includes('json') || !manifest.shortcuts?.some((shortcut) => shortcut.url === '/archive/') || !manifest.shortcuts?.some((shortcut) => shortcut.url === '/observations/')) {
+  throw new Error('웹앱 manifest 또는 주요 바로가기를 확인할 수 없습니다.');
+}
+console.log('통과  웹앱 manifest 및 주요 바로가기');
+
 const assetPath = homeBodyForHeaders.match(/(?:href|src)=["'](\/_astro\/[^"']+)["']/)?.[1];
 if (!assetPath) throw new Error('캐시 정책을 확인할 빌드 자산을 찾을 수 없습니다.');
 const { response: assetResponse } = await request(assetPath);

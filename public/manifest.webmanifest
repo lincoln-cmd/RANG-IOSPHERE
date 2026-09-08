@@ -11,6 +11,22 @@
   "background_color": "#060914",
   "theme_color": "#060914",
   "categories": ["education", "science", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "관측 아카이브",
+      "short_name": "아카이브",
+      "description": "공개된 천체관측 기록을 찾아봅니다.",
+      "url": "/archive/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "관측 데이터",
+      "short_name": "관측 데이터",
+      "description": "공개 관측 데이터 현황을 확인합니다.",
+      "url": "/observations/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
