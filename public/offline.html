@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#060914" />
     <title>연결 대기 중 | 랑이오스페어</title>
     <style>
-      :root{color-scheme:dark}*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#060914;color:#eef2f8;font-family:system-ui,sans-serif}.panel{width:min(100%,620px);padding:44px;border:1px solid #2d3749;background:#090f1c}.mark{width:52px;height:52px;display:grid;place-items:center;margin-bottom:56px;border:1px solid #b8ff5a;border-radius:50%;color:#b8ff5a;font:600 20px monospace}.eyebrow{color:#b8ff5a;font:11px monospace;letter-spacing:.14em}h1{margin:18px 0;font-size:clamp(34px,8vw,64px);line-height:1.08;letter-spacing:-.04em}p{max-width:480px;color:#a9b5c8;line-height:1.8}button{margin-top:28px;padding:12px 18px;border:1px solid #b8ff5a;color:#b8ff5a;background:transparent;font-weight:700;cursor:pointer}button:hover,button:focus-visible{color:#061006;background:#b8ff5a;outline:none}@media(max-width:520px){.panel{padding:30px}.mark{margin-bottom:42px}}
+      :root{color-scheme:dark}*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#060914;color:#eef2f8;font-family:system-ui,sans-serif}.panel{width:min(100%,620px);padding:44px;border:1px solid #2d3749;background:#090f1c}.mark{width:52px;height:52px;display:grid;place-items:center;margin-bottom:56px;border:1px solid #b8ff5a;border-radius:50%;color:#b8ff5a;font:600 20px monospace}.eyebrow{color:#b8ff5a;font:11px monospace;letter-spacing:.14em}h1{margin:18px 0;font-size:clamp(34px,8vw,64px);line-height:1.08;letter-spacing:-.04em}p{max-width:480px;color:#a9b5c8;line-height:1.8}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}button,a{min-height:44px;padding:12px 18px;border:1px solid #b8ff5a;color:#b8ff5a;background:transparent;font:700 14px system-ui,sans-serif;text-decoration:none;cursor:pointer}a{border-color:#455167;color:#c6d0df}button:hover,button:focus-visible,a:hover,a:focus-visible{color:#061006;background:#b8ff5a;border-color:#b8ff5a;outline:none}.status{min-height:1.8em;margin-bottom:0;color:#8795aa;font-size:13px}@media(max-width:520px){.panel{padding:30px}.mark{margin-bottom:42px}.actions>*{width:100%;text-align:center}}
     </style>
   </head>
   <body>
@@ -14,8 +14,26 @@
       <div class="mark" aria-hidden="true">R</div>
       <p class="eyebrow">SIGNAL TEMPORARILY LOST</p>
       <h1>관측 신호를<br />기다리는 중입니다.</h1>
-      <p>현재 네트워크에 연결할 수 없습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요. 이전에 열어 본 기록은 오프라인에서도 표시될 수 있습니다.</p>
-      <button type="button" onclick="location.reload()">다시 연결하기</button>
+      <p>현재 네트워크에 연결할 수 없습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요. 저장된 홈과 기록은 오프라인에서도 열 수 있습니다.</p>
+      <div class="actions">
+        <button type="button" id="retry">다시 연결하기</button>
+        <a href="/">저장된 홈 보기</a>
+        <a href="/archive/">저장된 기록 보기</a>
+      </div>
+      <p class="status" id="connection-status" role="status" aria-live="polite">네트워크 연결을 기다리고 있습니다.</p>
     </main>
+    <script>
+      const retry = document.querySelector('#retry');
+      const status = document.querySelector('#connection-status');
+      const refreshStatus = () => {
+        const online = navigator.onLine;
+        status.textContent = online ? '네트워크가 연결되었습니다. 다시 연결해 주세요.' : '네트워크 연결을 기다리고 있습니다.';
+        retry.textContent = online ? '사이트 다시 열기' : '다시 연결하기';
+      };
+      retry.addEventListener('click', () => location.reload());
+      window.addEventListener('online', refreshStatus);
+      window.addEventListener('offline', refreshStatus);
+      refreshStatus();
+    </script>
   </body>
 </html>

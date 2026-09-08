@@ -45,6 +45,7 @@ const checks = [
   ['/rss.xml', '<rss'],
   ['/robots.txt', 'Sitemap: https://rang-iosphere.pages.dev/sitemap-index.xml'],
   ['/sitemap-index.xml', '<sitemapindex'],
+  ['/offline.html', '저장된 기록 보기'],
 ];
 
 for (const [path, marker] of checks) {
@@ -52,6 +53,14 @@ for (const [path, marker] of checks) {
   if (!body.includes(marker)) throw new Error(`${path}: 필수 문구를 찾을 수 없습니다: ${marker}`);
   console.log(`통과  ${path}`);
 }
+
+const notFoundURL = new URL(`/missing-record-${Date.now()}/`, siteURL);
+const notFoundResponse = await fetch(notFoundURL, { headers: { 'cache-control': 'no-cache' }, signal: AbortSignal.timeout(15_000) });
+const notFoundBody = await notFoundResponse.text();
+if (notFoundResponse.status !== 404 || !notFoundBody.includes('관측 범위를')) {
+  throw new Error(`/404: 잘못된 주소의 복구 화면을 확인할 수 없습니다. HTTP ${notFoundResponse.status}`);
+}
+console.log('통과  잘못된 주소의 404 복구 화면');
 
 const { response: homeResponse, body: homeBodyForHeaders } = await request('/');
 requireHeader(homeResponse, 'content-security-policy', ["default-src 'self'", "object-src 'none'", "frame-ancestors 'self'"]);
