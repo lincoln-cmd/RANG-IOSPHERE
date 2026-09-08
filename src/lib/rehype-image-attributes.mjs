@@ -1,3 +1,5 @@
+import { getPublicImageDimensions } from './image-dimensions.mjs';
+
 export default function rehypeImageAttributes() {
   return (tree) => {
     const visit = (node) => {
@@ -29,6 +31,11 @@ export default function rehypeImageAttributes() {
           child.properties ??= {};
           child.properties.loading ??= 'lazy';
           child.properties.decoding ??= 'async';
+          const dimensions = getPublicImageDimensions(child.properties.src);
+          if (dimensions) {
+            child.properties.width ??= dimensions.width;
+            child.properties.height ??= dimensions.height;
+          }
         }
         visit(child);
       });

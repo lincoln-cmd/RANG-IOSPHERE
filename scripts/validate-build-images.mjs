@@ -12,6 +12,18 @@ const attributeValue = (attributes, name) => attributes.match(new RegExp(`\\s${n
 const failures = [];
 let checkedImages = 0;
 
+const validateImage = (source, attributes) => {
+  checkedImages += 1;
+  const loading = attributeValue(attributes, 'loading');
+  const decoding = attributeValue(attributes, 'decoding');
+  const imageSource = attributeValue(attributes, 'src') ?? '';
+  if (loading !== 'lazy') failures.push(`${source}: 본문 이미지에 loading="lazy"가 없습니다.`);
+  if (decoding !== 'async') failures.push(`${source}: 본문 이미지에 decoding="async"가 없습니다.`);
+  if (imageSource.startsWith('/') && (!attributeValue(attributes, 'width') || !attributeValue(attributes, 'height'))) {
+    failures.push(`${source}: 로컬 본문 이미지에 원본 width와 height가 없습니다.`);
+  }
+};
+
 for (const htmlFile of walk(outputDirectory).filter((path) => extname(path) === '.html')) {
   const html = readFileSync(htmlFile, 'utf8');
   const source = `/${relative(outputDirectory, htmlFile).split(sep).join('/')}`;
@@ -19,11 +31,12 @@ for (const htmlFile of walk(outputDirectory).filter((path) => extname(path) === 
   if (!prose) continue;
 
   for (const match of prose.matchAll(/<img\b([^>]*)>/gi)) {
-    checkedImages += 1;
-    const loading = attributeValue(match[1], 'loading');
-    const decoding = attributeValue(match[1], 'decoding');
-    if (loading !== 'lazy') failures.push(`${source}: 본문 이미지에 loading="lazy"가 없습니다.`);
-    if (decoding !== 'async') failures.push(`${source}: 본문 이미지에 decoding="async"가 없습니다.`);
+    validateImage(source, match[1]);
+  }
+
+  const cover = html.match(/<figure\b[^>]*\bclass=["'][^"']*\barticle-cover\b[^"']*["'][^>]*>[\s\S]*?<img\b([^>]*)>/i);
+  if (cover) {
+    validateImage(source, cover[1]);
   }
 }
 
