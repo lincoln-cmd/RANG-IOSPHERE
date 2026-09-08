@@ -114,6 +114,10 @@ const { body: sitemapIndex } = await request('/sitemap-index.xml');
 const childSitemapURL = sitemapIndex.match(/<loc>([^<]+)<\/loc>/)?.[1];
 if (childSitemapURL) {
   const { body: childSitemap } = await request(new URL(childSitemapURL).pathname);
+  if (!/<url>[\s\S]*?<loc>[^<]+\/archive\/[^<]+<\/loc>[\s\S]*?<lastmod>[^<]+<\/lastmod>[\s\S]*?<\/url>/.test(childSitemap)) {
+    throw new Error('사이트맵에서 게시물 수정일을 확인할 수 없습니다.');
+  }
+  console.log('통과  사이트맵 게시물 수정일');
   const articleURLs = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).filter((url) => /\/archive\/[^/]+\/$/.test(url));
   const articleURL = articleURLs[0];
   if (articleURL) {

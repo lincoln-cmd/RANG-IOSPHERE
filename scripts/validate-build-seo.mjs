@@ -13,8 +13,12 @@ let checkedArticles = 0;
 const sitemapPath = resolve(outputDirectory, 'sitemap-0.xml');
 if (!existsSync(sitemapPath)) throw new Error('공개 페이지 목록을 담은 sitemap-0.xml이 없습니다.');
 const sitemap = readFileSync(sitemapPath, 'utf8');
-const htmlFiles = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => {
-  const pathname = decodeURIComponent(new URL(match[1]).pathname);
+const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => ({
+  url: decode(match[1].match(/<loc>([^<]+)<\/loc>/)?.[1]),
+  lastmod: match[1].match(/<lastmod>([^<]+)<\/lastmod>/)?.[1],
+}));
+const htmlFiles = sitemapEntries.map((entry) => {
+  const pathname = decodeURIComponent(new URL(entry.url).pathname);
   return pathname === '/'
     ? resolve(outputDirectory, 'index.html')
     : resolve(outputDirectory, pathname.replace(/^\/+/, ''), 'index.html');
@@ -82,6 +86,8 @@ for (const htmlFile of htmlFiles) {
     const article = structuredData.find((item) => item?.['@type'] === 'BlogPosting');
     const breadcrumb = structuredData.find((item) => item?.['@type'] === 'BreadcrumbList');
     if (!article || article.url !== canonical || article.mainEntityOfPage !== canonical || !article.headline || !article.datePublished) report('BlogPosting 구조화 데이터가 불완전합니다.');
+    const sitemapEntry = sitemapEntries.find((entry) => entry.url === canonical);
+    if (!article?.dateModified || sitemapEntry?.lastmod !== article.dateModified) report(`사이트맵 수정일이 BlogPosting dateModified와 일치하지 않습니다: ${sitemapEntry?.lastmod ?? '없음'}`);
     if (!breadcrumb || breadcrumb.itemListElement?.at(-1)?.item !== canonical) report('BreadcrumbList 구조화 데이터가 불완전합니다.');
     const actions = html.match(/<div\b[^>]*\bclass=["'][^"']*\barticle-actions\b[^"']*["'][^>]*>/i)?.[0];
     const citation = actions ? decode(attr(actions, 'data-citation')) : undefined;
