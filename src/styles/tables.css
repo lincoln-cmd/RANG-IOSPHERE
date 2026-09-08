@@ -8,6 +8,8 @@
 .prose .table-scroll th { color:var(--ink); background:#10182a; font-size:12px; }
 .prose .table-scroll th,.prose .table-scroll td { padding:13px 15px; border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
 .prose .table-scroll th:last-child,.prose .table-scroll td:last-child { border-right:0; }
+.prose .table-scroll [align="center"] { text-align:center; }
+.prose .table-scroll [align="right"] { text-align:right; }
 .prose .table-scroll tbody tr:last-child td { border-bottom:0; }
 .prose .table-scroll tbody tr:hover { background:rgba(147,183,255,.04); }
 @media (max-width:560px) { .prose .table-scroll { width:calc(100% + 16px); margin:24px -8px; }.prose .table-scroll table { min-width:520px; } }
