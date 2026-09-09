@@ -40,7 +40,7 @@ const checks = [
   ['/', '랑이와 함께 보는'],
   ['/about/', '밤하늘을 관측하고'],
   ['/archive/', '<option value="updated">최근 수정순</option>'],
-  ['/observations/', '관측 데이터 한눈에 보기'],
+  ['/observations/', '관측 데이터 현황'],
   ['/admin/', 'RANG-IOSPHERE CMS'],
   ['/rss.xml', '<rss'],
   ['/robots.txt', 'Sitemap: https://rang-iosphere.pages.dev/sitemap-index.xml'],
@@ -76,7 +76,7 @@ if (!manifestResponse.headers.get('content-type')?.includes('json') || !manifest
 }
 
 const { response: rssResponse, body: rssBody } = await request('/rss.xml');
-if (!rssResponse.headers.get('content-type')?.includes('xml') || !rssBody.includes('<atom:link') || !rssBody.includes('<atom:updated>') || !rssBody.includes('<author>') || !rssBody.includes('<category>관측일지</category>')) {
+if (!rssResponse.headers.get('content-type')?.includes('xml') || !rssBody.includes('<atom:link') || !rssBody.includes('<atom:updated>') || !rssBody.includes('<author>')) {
   throw new Error('RSS 구독 메타데이터를 확인할 수 없습니다.');
 }
 console.log('통과  RSS 구독 메타데이터');

@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { byPublishedDate, hasObservationData } from '../lib/content';
 
 export const GET: APIRoute = async () => {
-  const appCacheVersion = '2026-09-09-observation-insights-33';
+  const appCacheVersion = '2026-09-09-content-cleanup-34';
   const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
   const offlinePosts = posts.slice(0, 30);
   const pages = ['/', '/archive/', '/observations/', '/about/', ...offlinePosts.map((post) => `/archive/${post.id}/`)];

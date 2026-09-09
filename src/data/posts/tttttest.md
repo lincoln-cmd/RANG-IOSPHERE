@@ -5,7 +5,7 @@ category: equipment
 tags:
   - TTTTTest
 publishedAt: 2026-09-05
-draft: false
+draft: true
 featured: false
 observation:
   equipment: []

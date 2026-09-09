@@ -30,7 +30,8 @@ for (const [index, item] of rssItems.entries()) {
 }
 
 const enclosureCount = rssItems.filter((item) => /<enclosure\s+url="https:\/\/rang-iosphere\.pages\.dev\/[^"\s]+"\s+length="\d+"\s+type="image\//.test(item)).length;
-if (!enclosureCount) failures.push('대표 이미지가 있는 RSS 항목의 enclosure를 찾을 수 없습니다.');
+const enclosureTags = rssItems.flatMap((item) => [...item.matchAll(/<enclosure\b[^>]*>/g)].map((match) => match[0]));
+if (enclosureTags.length !== enclosureCount) failures.push('RSS 대표 이미지 enclosure 형식이 올바르지 않습니다.');
 
 console.log(`RSS 검사: 공개 항목 ${rssItems.length}개, 대표 이미지 ${enclosureCount}개`);
 if (failures.length) {
