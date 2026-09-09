@@ -5,6 +5,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { formatDate, hasObservationData } from '../lib/content';
 import '../styles/observations.css';
+import '../styles/observations-insights.css';
 import '../styles/observations-export.css';
 import '../styles/observations-mobile.css';
 
@@ -13,6 +14,18 @@ const records = (await getCollection('posts', ({ data }) => !data.draft && Boole
 const targets = new Set(records.flatMap((post) => post.data.observation?.target ? [post.data.observation.target] : []));
 const equipment = new Set(records.flatMap((post) => post.data.observation?.equipment ?? []));
 const latestObservation = records.find((post) => post.data.observation?.observedAt)?.data.observation?.observedAt;
+const oldestObservation = records.at(-1)?.data.observation?.observedAt;
+const countValues = (values: string[]) => [...values.reduce((counts, value) => counts.set(value, (counts.get(value) ?? 0) + 1), new Map<string, number>())]
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko-KR'));
+const targetCounts = countValues(records.flatMap((post) => post.data.observation?.target ? [post.data.observation.target] : [])).slice(0, 5);
+const equipmentCounts = countValues(records.flatMap((post) => post.data.observation?.equipment ?? [])).slice(0, 5);
+const maxTargetCount = Math.max(...targetCounts.map(([, count]) => count), 1);
+const maxEquipmentCount = Math.max(...equipmentCounts.map(([, count]) => count), 1);
+const temperatures = records.flatMap((post) => post.data.observation?.temperatureC === undefined ? [] : [post.data.observation.temperatureC]);
+const humidities = records.flatMap((post) => post.data.observation?.humidityPercent === undefined ? [] : [post.data.observation.humidityPercent]);
+const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined;
+const averageTemperature = average(temperatures);
+const averageHumidity = average(humidities);
 const datasetStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Dataset',
@@ -45,6 +58,33 @@ const datasetStructuredData = {
         <div><dt>LATEST</dt><dd>{latestObservation ? formatDate(latestObservation) : '—'}</dd></div>
       </dl>
     </header>
+
+    {records.length > 0 && (
+      <section class="observations-insights" aria-labelledby="insights-title">
+        <div class="observations-insights-heading">
+          <div><p class="eyebrow">DATA SNAPSHOT</p><h2 id="insights-title">관측 데이터 한눈에 보기</h2></div>
+          <p>{oldestObservation && latestObservation ? `${formatDate(oldestObservation)}부터 ${formatDate(latestObservation)}까지 공개된 기록을 자동 집계합니다.` : '공개된 기록을 기준으로 자동 집계합니다.'}</p>
+        </div>
+        <div class="insights-grid">
+          <article class="insight-panel insight-ranking">
+            <header><p>OBSERVED TARGETS</p><h3>자주 관측한 대상</h3></header>
+            <ol>{targetCounts.map(([label, count], index) => <li><span class="rank">{String(index + 1).padStart(2, '0')}</span><div><strong>{label}</strong><i style={`--bar:${count / maxTargetCount}`}></i></div><b>{count}</b></li>)}</ol>
+          </article>
+          <article class="insight-panel insight-ranking">
+            <header><p>USED EQUIPMENT</p><h3>장비 사용 빈도</h3></header>
+            <ol>{equipmentCounts.map(([label, count], index) => <li><span class="rank">{String(index + 1).padStart(2, '0')}</span><div><strong>{label}</strong><i style={`--bar:${count / maxEquipmentCount}`}></i></div><b>{count}</b></li>)}</ol>
+          </article>
+          <article class="insight-panel insight-conditions">
+            <header><p>FIELD CONDITIONS</p><h3>공개 환경값 평균</h3></header>
+            <dl>
+              <div><dt>기온</dt><dd>{averageTemperature === undefined ? '—' : `${averageTemperature.toFixed(1)} °C`}</dd><small>{temperatures.length}개 기록</small></div>
+              <div><dt>습도</dt><dd>{averageHumidity === undefined ? '—' : `${averageHumidity.toFixed(0)}%`}</dd><small>{humidities.length}개 기록</small></div>
+            </dl>
+            <p>값이 입력된 공개 관측일지만 계산합니다.</p>
+          </article>
+        </div>
+      </section>
+    )}
 
     <section class="observations-ledger" aria-labelledby="ledger-title">
       <div class="observations-heading">

@@ -40,7 +40,7 @@ const checks = [
   ['/', '랑이와 함께 보는'],
   ['/about/', '밤하늘을 관측하고'],
   ['/archive/', '<option value="updated">최근 수정순</option>'],
-  ['/observations/', '관측 데이터 현황'],
+  ['/observations/', '관측 데이터 한눈에 보기'],
   ['/admin/', 'RANG-IOSPHERE CMS'],
   ['/rss.xml', '<rss'],
   ['/robots.txt', 'Sitemap: https://rang-iosphere.pages.dev/sitemap-index.xml'],
