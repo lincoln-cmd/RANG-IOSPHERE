@@ -29,6 +29,9 @@ const metaValue = (html, key, value) => {
     if (attr(match[0], key)?.toLowerCase() === value.toLowerCase()) return decode(attr(match[0], 'content'));
   }
 };
+const metaValues = (html, key, value) => [...html.matchAll(/<meta\b[^>]*>/gi)]
+  .filter((match) => attr(match[0], key)?.toLowerCase() === value.toLowerCase())
+  .map((match) => decode(attr(match[0], 'content')));
 const linkValue = (html, rel) => {
   for (const match of html.matchAll(/<link\b[^>]*>/gi)) {
     if ((attr(match[0], 'rel') ?? '').toLowerCase().split(/\s+/).includes(rel)) return decode(attr(match[0], 'href'));
@@ -68,6 +71,8 @@ for (const htmlFile of htmlFiles) {
     if (!ogImage.startsWith('https://')) report('og:image는 절대 HTTPS 주소여야 합니다.');
     if (twitterImage !== ogImage) report('twitter:image와 og:image가 일치하지 않습니다.');
     if (!metaValue(html, 'property', 'og:image:alt') || !metaValue(html, 'name', 'twitter:image:alt')) report('공유 이미지 설명이 없습니다.');
+    if (!/^\d+$/.test(metaValue(html, 'property', 'og:image:width') ?? '') || !/^\d+$/.test(metaValue(html, 'property', 'og:image:height') ?? '')) report('공유 이미지 크기 정보가 없습니다.');
+    if (!/^image\//.test(metaValue(html, 'property', 'og:image:type') ?? '')) report('공유 이미지 형식 정보가 없습니다.');
   } else if (twitterImage) report('og:image 없이 twitter:image만 존재합니다.');
 
   const structuredData = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
@@ -88,6 +93,12 @@ for (const htmlFile of htmlFiles) {
     if (!article || article.url !== canonical || article.mainEntityOfPage !== canonical || !article.headline || !article.datePublished) report('BlogPosting 구조화 데이터가 불완전합니다.');
     const sitemapEntry = sitemapEntries.find((entry) => entry.url === canonical);
     if (!article?.dateModified || sitemapEntry?.lastmod !== article.dateModified) report(`사이트맵 수정일이 BlogPosting dateModified와 일치하지 않습니다: ${sitemapEntry?.lastmod ?? '없음'}`);
+    if (metaValue(html, 'property', 'article:published_time') !== article?.datePublished) report('article:published_time이 BlogPosting datePublished와 일치하지 않습니다.');
+    if (metaValue(html, 'property', 'article:modified_time') !== article?.dateModified) report('article:modified_time이 BlogPosting dateModified와 일치하지 않습니다.');
+    if (metaValue(html, 'property', 'article:section') !== article?.articleSection) report('article:section이 BlogPosting articleSection과 일치하지 않습니다.');
+    const articleTags = metaValues(html, 'property', 'article:tag');
+    const structuredTags = typeof article?.keywords === 'string' ? article.keywords.split(', ').filter(Boolean) : [];
+    if (articleTags.length !== structuredTags.length || articleTags.some((tag, index) => tag !== structuredTags[index])) report('article:tag가 BlogPosting keywords와 일치하지 않습니다.');
     if (!breadcrumb || breadcrumb.itemListElement?.at(-1)?.item !== canonical) report('BreadcrumbList 구조화 데이터가 불완전합니다.');
     const actions = html.match(/<div\b[^>]*\bclass=["'][^"']*\barticle-actions\b[^"']*["'][^>]*>/i)?.[0];
     const citation = actions ? decode(attr(actions, 'data-citation')) : undefined;

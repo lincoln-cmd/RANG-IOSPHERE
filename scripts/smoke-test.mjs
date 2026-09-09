@@ -123,6 +123,9 @@ if (childSitemapURL) {
   if (articleURL) {
     const { body: articleBody } = await request(new URL(articleURL).pathname);
     if (!articleBody.includes('<article')) throw new Error(`게시물 상세 스모크 테스트 실패: ${articleURL}`);
+    for (const marker of ['property="article:published_time"', 'property="article:modified_time"', 'property="article:section"', 'property="article:tag"']) {
+      if (!articleBody.includes(marker)) throw new Error(`게시물 공유 메타데이터가 없습니다: ${marker}`);
+    }
     if (!articleBody.includes('data-copy-bibtex') || !articleBody.includes('data-bibtex="@online')) throw new Error(`게시물 BibTeX 인용 기능이 없습니다: ${articleURL}`);
     if (!articleBody.includes('CSV 저장') || !articleBody.includes('표 복사')) throw new Error(`게시물 표 도구 스크립트가 없습니다: ${articleURL}`);
     console.log(`통과  ${new URL(articleURL).pathname}`);
@@ -134,6 +137,18 @@ if (childSitemapURL) {
     }
     console.log(`통과  ${sourcePath}`);
   }
+  let checkedSocialImage = false;
+  for (const candidateURL of articleURLs) {
+    const { body: articleBody } = await request(new URL(candidateURL).pathname);
+    if (!articleBody.includes('property="og:image"')) continue;
+    for (const marker of ['property="og:image:width"', 'property="og:image:height"', 'property="og:image:type"']) {
+      if (!articleBody.includes(marker)) throw new Error(`공유 이미지 메타데이터가 없습니다: ${marker}`);
+    }
+    checkedSocialImage = true;
+    break;
+  }
+  if (!checkedSocialImage) throw new Error('대표 이미지가 있는 게시물의 공유 메타데이터를 확인할 수 없습니다.');
+  console.log('통과  게시물 및 대표 이미지 공유 메타데이터');
   for (const candidateURL of articleURLs) {
     const { body: articleBody } = await request(new URL(candidateURL).pathname);
     const dataPath = articleBody.match(/href="([^"]+\/data\.json)"/)?.[1];

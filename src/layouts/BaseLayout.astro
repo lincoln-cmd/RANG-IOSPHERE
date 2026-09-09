@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import '../styles/app-update.css';
+import { getPublicImageMetadata } from '../lib/image-dimensions.mjs';
 
 interface Props {
   title?: string;
@@ -8,6 +9,10 @@ interface Props {
   socialImage?: string | null;
   socialImageAlt?: string;
   pageType?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  articleSection?: string;
+  articleTags?: string[];
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
@@ -17,9 +22,14 @@ const {
   socialImage = '/og.jpg',
   socialImageAlt = '랑이오스페어 개인 천체관측 아카이브',
   pageType = 'website',
+  publishedTime,
+  modifiedTime,
+  articleSection,
+  articleTags = [],
   structuredData,
 } = Astro.props;
 const resolvedSocialImage = socialImage ? new URL(socialImage, Astro.site ?? Astro.url) : null;
+const socialImageMetadata = socialImage ? getPublicImageMetadata(socialImage) : undefined;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
 const rssURL = new URL('/rss.xml', Astro.site ?? Astro.url);
 const serializedStructuredData = structuredData ? JSON.stringify(structuredData).replace(/</g, '\\u003c') : null;
@@ -54,6 +64,13 @@ const naverSiteVerification = import.meta.env.PUBLIC_NAVER_SITE_VERIFICATION?.tr
     <meta property="og:url" content={canonicalURL} />
     {resolvedSocialImage && <meta property="og:image" content={resolvedSocialImage} />}
     {resolvedSocialImage && <meta property="og:image:alt" content={socialImageAlt} />}
+    {socialImageMetadata && <meta property="og:image:width" content={String(socialImageMetadata.width)} />}
+    {socialImageMetadata && <meta property="og:image:height" content={String(socialImageMetadata.height)} />}
+    {socialImageMetadata && <meta property="og:image:type" content={socialImageMetadata.type} />}
+    {pageType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {pageType === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {pageType === 'article' && articleSection && <meta property="article:section" content={articleSection} />}
+    {pageType === 'article' && articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

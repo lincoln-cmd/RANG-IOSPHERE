@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { isAbsolute, relative, resolve } from 'node:path';
+import { extname, isAbsolute, relative, resolve } from 'node:path';
 
 const publicDirectory = resolve(process.cwd(), 'public');
 
@@ -29,7 +29,15 @@ const webpDimensions = (buffer) => {
   }
 };
 
-export const getPublicImageDimensions = (source) => {
+const mimeTypes = new Map([
+  ['.gif', 'image/gif'],
+  ['.jpeg', 'image/jpeg'],
+  ['.jpg', 'image/jpeg'],
+  ['.png', 'image/png'],
+  ['.webp', 'image/webp'],
+]);
+
+export const getPublicImageMetadata = (source) => {
   if (typeof source !== 'string' || !source.startsWith('/') || source.startsWith('//')) return undefined;
   let pathname;
   try { pathname = decodeURIComponent(source.split(/[?#]/, 1)[0]); } catch { return undefined; }
@@ -39,10 +47,19 @@ export const getPublicImageDimensions = (source) => {
 
   try {
     const buffer = readFileSync(file);
-    if (buffer.toString('ascii', 1, 4) === 'PNG') return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
-    if (buffer.toString('ascii', 0, 3) === 'GIF') return { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) };
-    return jpegDimensions(buffer) ?? webpDimensions(buffer);
+    const dimensions = buffer.toString('ascii', 1, 4) === 'PNG'
+      ? { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) }
+      : buffer.toString('ascii', 0, 3) === 'GIF'
+        ? { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) }
+        : jpegDimensions(buffer) ?? webpDimensions(buffer);
+    const type = mimeTypes.get(extname(file).toLowerCase());
+    return dimensions && type ? { ...dimensions, type } : undefined;
   } catch {
     return undefined;
   }
+};
+
+export const getPublicImageDimensions = (source) => {
+  const metadata = getPublicImageMetadata(source);
+  return metadata ? { width: metadata.width, height: metadata.height } : undefined;
 };
