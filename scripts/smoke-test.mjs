@@ -1,6 +1,6 @@
 const siteURL = new URL(process.env.SITE_URL ?? process.argv[2] ?? 'https://rang-iosphere.pages.dev');
 const expectedCommit = process.env.EXPECTED_SHA?.trim();
-const attempts = Number(process.env.SMOKE_ATTEMPTS ?? 18);
+const attempts = Number(process.env.SMOKE_ATTEMPTS ?? 30);
 const delayMs = Number(process.env.SMOKE_DELAY_MS ?? 10_000);
 
 const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
