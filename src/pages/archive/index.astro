@@ -68,6 +68,7 @@ const archiveStructuredData = [
         <label for="archive-sort">정렬</label>
         <select id="archive-sort">
           <option value="newest">최신순</option>
+          <option value="updated">최근 수정순</option>
           <option value="oldest">오래된순</option>
         </select>
       </div>
@@ -89,17 +90,20 @@ const archiveStructuredData = [
             <header><span>{category.index}</span><div><p>{category.en}</p><h2>{category.label}</h2></div><strong data-group-count>{String(categoryPosts.length).padStart(2, '0')}</strong></header>
             {categoryPosts.length ? (
               <div class="post-list">
-                {categoryPosts.map((post) => (
-                  <article data-archive-post data-published={post.data.publishedAt?.getTime() ?? 0} data-year={post.data.publishedAt?.getFullYear()} data-search={`${post.data.title} ${post.data.description} ${post.data.series ?? ''} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')} data-series={(post.data.series ?? '').toLocaleLowerCase('ko')}>
+                {categoryPosts.map((post) => {
+                  const publishedTime = post.data.publishedAt?.getTime() ?? 0;
+                  const updatedTime = post.data.updatedAt?.getTime() ?? publishedTime;
+                  const wasUpdated = Boolean(post.data.updatedAt && updatedTime > publishedTime);
+                  return <article data-archive-post data-published={publishedTime} data-updated={updatedTime} data-year={post.data.publishedAt?.getFullYear()} data-search={`${post.data.title} ${post.data.description} ${post.data.series ?? ''} ${post.data.tags.join(' ')}`.toLocaleLowerCase('ko')} data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('ko')).join('|')} data-series={(post.data.series ?? '').toLocaleLowerCase('ko')}>
                     {post.data.cover && <a class="post-cover" href={`/archive/${post.id}/`} tabindex="-1" aria-hidden="true"><img src={post.data.cover} alt="" loading="lazy" decoding="async" /></a>}
-                    <p>{formatDate(post.data.publishedAt)}</p>
+                    <p class="post-dates"><span>공개 {formatDate(post.data.publishedAt)}</span>{wasUpdated && <span>수정 {formatDate(post.data.updatedAt)}</span>}</p>
                     <h3><a href={`/archive/${post.id}/`}>{post.data.title}</a></h3>
                     <p>{post.data.description}</p>
                     {post.data.series && <a class="post-series" href={`/archive/?series=${encodeURIComponent(post.data.series)}`}>SERIES · {post.data.series}</a>}
                     <div>{post.data.tags.map((tag) => <a href={`/archive/?tag=${encodeURIComponent(tag)}`}>#{tag}</a>)}</div>
                     <a href={`/archive/${post.id}/`} aria-label={`${post.data.title} 읽기`}>READ NOTE ↗</a>
-                  </article>
-                ))}
+                  </article>;
+                })}
               </div>
             ) : (
               <div class="empty-record"><span aria-hidden="true">＋</span><div><strong>아직 공개된 기록이 없습니다.</strong><p>직접 관측하고 공부한 내용을 정리한 뒤 첫 기록을 공개할 예정입니다.</p></div></div>
@@ -138,7 +142,7 @@ const archiveStructuredData = [
       selectedCategory = allowedCategories.includes(category) ? category : 'all';
       selectedTag = normalize(params.get('tag') || '');
       selectedSeries = normalize(params.get('series') || '');
-      selectedSort = params.get('sort') === 'oldest' ? 'oldest' : 'newest';
+      selectedSort = ['newest', 'updated', 'oldest'].includes(params.get('sort') || '') ? params.get('sort') : 'newest';
       const year = params.get('year') || 'all';
       selectedYear = [...(yearSelect?.options ?? [])].some((option) => option.value === year) ? year : 'all';
       if (queryInput) queryInput.value = params.get('q') || '';
@@ -153,7 +157,7 @@ const archiveStructuredData = [
       if (selectedTag) params.set('tag', selectedTag);
       if (selectedSeries) params.set('series', selectedSeries);
       if (selectedCategory !== 'all') params.set('category', selectedCategory);
-      if (selectedSort === 'oldest') params.set('sort', selectedSort);
+      if (selectedSort !== 'newest') params.set('sort', selectedSort);
       if (selectedYear !== 'all') params.set('year', selectedYear);
       const url = `${window.location.pathname}${params.size ? `?${params}` : ''}${window.location.hash}`;
       window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
@@ -167,7 +171,8 @@ const archiveStructuredData = [
         const posts = [...group.querySelectorAll('[data-archive-post]')];
         const postList = group.querySelector('.post-list');
         posts.sort((a, b) => {
-          const difference = Number(b.dataset.published || 0) - Number(a.dataset.published || 0);
+          const sortField = selectedSort === 'updated' ? 'updated' : 'published';
+          const difference = Number(b.dataset[sortField] || 0) - Number(a.dataset[sortField] || 0);
           return selectedSort === 'oldest' ? -difference : difference;
         });
         if (postList) posts.forEach((post) => postList.append(post));
@@ -203,7 +208,7 @@ const archiveStructuredData = [
     };
 
     queryInput?.addEventListener('input', () => { selectedTag = ''; selectedSeries = ''; writeURLState(); applyArchiveFilters(); });
-    sortSelect?.addEventListener('change', () => { selectedSort = sortSelect.value === 'oldest' ? 'oldest' : 'newest'; writeURLState('push'); applyArchiveFilters(); });
+    sortSelect?.addEventListener('change', () => { selectedSort = ['newest', 'updated', 'oldest'].includes(sortSelect.value) ? sortSelect.value : 'newest'; writeURLState('push'); applyArchiveFilters(); });
     yearSelect?.addEventListener('change', () => { selectedYear = yearSelect.value; writeURLState('push'); applyArchiveFilters(); });
     filterButtons.forEach((button) => button.addEventListener('click', () => {
       selectedCategory = button.dataset.categoryFilter;

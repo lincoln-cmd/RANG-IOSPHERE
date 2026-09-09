@@ -22,7 +22,7 @@ if (!rss.includes('<language>ko-kr</language>')) failures.push('RSS 언어 정�
 if (rssItems.length !== articleURLs.length || articleURLs.some((url) => !itemURLs.includes(url))) failures.push(`RSS 항목 ${rssItems.length}개와 공개 게시물 ${articleURLs.length}개가 일치하지 않습니다.`);
 
 for (const [index, item] of rssItems.entries()) {
-  const required = ['<title>', '<link>', '<guid ', '<description>', '<pubDate>', '<author>', '<category>'];
+  const required = ['<title>', '<link>', '<guid ', '<description>', '<pubDate>', '<author>', '<category>', '<atom:updated>'];
   for (const marker of required) if (!item.includes(marker)) failures.push(`RSS 항목 ${index + 1}: ${marker} 메타데이터가 없습니다.`);
   const link = decodeXML(item.match(/<link>([^<]+)<\/link>/)?.[1] ?? '');
   const guid = decodeXML(item.match(/<guid[^>]*>([^<]+)<\/guid>/)?.[1] ?? '');

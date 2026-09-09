@@ -25,6 +25,7 @@ pnpm new:post -- --title "목성 관측일지" --category observation --slug jup
 5. 기존 파일은 덮어쓰지 않습니다.
 
 글을 완성하면 `publishedAt`을 입력하고 `draft: false`로 변경합니다.
+공개 후 내용을 의미 있게 고쳤다면 `updatedAt`에 수정한 날짜를 입력합니다. 아카이브 카드에 수정일이 표시되고 `최근 수정순` 정렬과 RSS 갱신일에 반영됩니다.
 
 ```yaml
 ---

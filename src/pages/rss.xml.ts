@@ -44,6 +44,7 @@ export async function GET(context: { site?: URL }) {
       author: 'dhkim1551@naver.com (김동훈)',
       categories: [categories[post.data.category].label, ...post.data.tags],
       enclosure: coverEnclosure(post.data.cover, site),
+      customData: `<atom:updated>${(post.data.updatedAt ?? post.data.publishedAt!).toISOString()}</atom:updated>`,
     })),
   });
 }
