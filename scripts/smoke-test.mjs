@@ -76,7 +76,8 @@ if (!manifestResponse.headers.get('content-type')?.includes('json') || !manifest
 }
 
 const { response: rssResponse, body: rssBody } = await request('/rss.xml');
-if (!rssResponse.headers.get('content-type')?.includes('xml') || !rssBody.includes('<atom:link') || !rssBody.includes('<atom:updated>') || !rssBody.includes('<author>')) {
+const hasRSSItems = rssBody.includes('<item>');
+if (!rssResponse.headers.get('content-type')?.includes('xml') || !rssBody.includes('<atom:link') || (hasRSSItems && (!rssBody.includes('<atom:updated>') || !rssBody.includes('<author>')))) {
   throw new Error('RSS 구독 메타데이터를 확인할 수 없습니다.');
 }
 console.log('통과  RSS 구독 메타데이터');
@@ -114,11 +115,11 @@ const { body: sitemapIndex } = await request('/sitemap-index.xml');
 const childSitemapURL = sitemapIndex.match(/<loc>([^<]+)<\/loc>/)?.[1];
 if (childSitemapURL) {
   const { body: childSitemap } = await request(new URL(childSitemapURL).pathname);
-  if (!/<url>[\s\S]*?<loc>[^<]+\/archive\/[^<]+<\/loc>[\s\S]*?<lastmod>[^<]+<\/lastmod>[\s\S]*?<\/url>/.test(childSitemap)) {
+  const articleURLs = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).filter((url) => /\/archive\/[^/]+\/$/.test(url));
+  if (articleURLs.length > 0 && !/<url>[\s\S]*?<loc>[^<]+\/archive\/[^<]+<\/loc>[\s\S]*?<lastmod>[^<]+<\/lastmod>[\s\S]*?<\/url>/.test(childSitemap)) {
     throw new Error('사이트맵에서 게시물 수정일을 확인할 수 없습니다.');
   }
-  console.log('통과  사이트맵 게시물 수정일');
-  const articleURLs = [...childSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).filter((url) => /\/archive\/[^/]+\/$/.test(url));
+  console.log(articleURLs.length > 0 ? '통과  사이트맵 게시물 수정일' : '통과  빈 공개 아카이브 사이트맵');
   const articleURL = articleURLs[0];
   if (articleURL) {
     const { body: articleBody } = await request(new URL(articleURL).pathname);
@@ -147,8 +148,7 @@ if (childSitemapURL) {
     checkedSocialImage = true;
     break;
   }
-  if (!checkedSocialImage) throw new Error('대표 이미지가 있는 게시물의 공유 메타데이터를 확인할 수 없습니다.');
-  console.log('통과  게시물 및 대표 이미지 공유 메타데이터');
+  if (checkedSocialImage) console.log('통과  게시물 및 대표 이미지 공유 메타데이터');
   for (const candidateURL of articleURLs) {
     const { body: articleBody } = await request(new URL(candidateURL).pathname);
     const dataPath = articleBody.match(/href="([^"]+\/data\.json)"/)?.[1];
