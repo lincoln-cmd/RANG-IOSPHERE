@@ -4,6 +4,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { getCollection } from 'astro:content';
 import { byPublishedDate } from '../lib/content';
+import '../styles/network.css';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft && Boolean(data.publishedAt))).sort(byPublishedDate);
 const highlightedPost = posts.find((post) => post.data.featured) ?? posts[0];
@@ -28,6 +29,34 @@ const sectors = [
   { id: 'theory', category: 'theory', index: '03', label: '관측 이론', en: 'Field Theory', x: 58, y: 43, note: '관측을 이해하는 데 필요한 이론' },
   { id: 'simulation', category: 'simulation', index: '04', label: '시뮬레이션', en: 'Simulation', x: 72, y: 27, note: '예측값과 실제 관측의 비교' },
   { id: 'data', category: 'open-data', index: '05', label: '오픈데이터', en: 'Open Data', x: 80, y: 61, note: '공개 천문 데이터 탐구' },
+];
+
+const networkSites = [
+  {
+    index: '01',
+    name: '랑이슈타인',
+    en: 'RANGISTEIN',
+    field: 'SCIENCE ARCHIVE',
+    description: '수학과 자연과학의 이론, 최신 동향과 논문을 공부하고 정리하는 과학 아카이브',
+    url: 'https://rangistein.pages.dev/',
+  },
+  {
+    index: '02',
+    name: '랑이오스페어',
+    en: 'RANG-IOSPHERE',
+    field: 'NIGHT-SKY ARCHIVE',
+    description: '직접 관측한 밤하늘과 장비, 이론과 공개 데이터를 함께 쌓아가는 천체관측 아카이브',
+    url: '/',
+    current: true,
+  },
+  {
+    index: '03',
+    name: '헤지캣',
+    en: 'HEDGECAT',
+    field: 'QUANT DATA LAB',
+    description: '금융공학 이론과 검증된 시뮬레이터를 연결하는 개인 연구 데이터 랩',
+    url: 'https://hedgecat.pages.dev/',
+  },
 ];
 ---
 
@@ -98,6 +127,29 @@ const sectors = [
           <span class="record-number">0000</span>
         </>
       )}
+    </section>
+
+    <section class="project-network" aria-labelledby="network-title">
+      <div class="network-heading">
+        <div>
+          <p class="eyebrow">RANG NETWORK · THREE FIELDS</p>
+          <h2 id="network-title">관심을 따라 이어지는<br />세 개의 탐구 공간</h2>
+        </div>
+        <p>과학 이론에서 밤하늘의 실제 관측으로, 다시 데이터와 금융공학의 실험으로 이어집니다. 서로 다른 분야를 하나의 탐구 과정처럼 오가세요.</p>
+      </div>
+      <div class="network-grid">
+        {networkSites.map((site) => (
+          <a class:list={["network-card", { current: site.current }]} href={site.url} aria-current={site.current ? 'page' : undefined}>
+            <div class="network-card-meta"><span>{site.index}</span><small>{site.field}</small></div>
+            <div>
+              <p>{site.en}</p>
+              <h3>{site.name}</h3>
+              <span>{site.description}</span>
+            </div>
+            <strong>{site.current ? 'YOU ARE HERE' : 'VISIT SITE'} <i aria-hidden="true">{site.current ? '●' : '↗'}</i></strong>
+          </a>
+        ))}
+      </div>
     </section>
 
     <SiteFooter />

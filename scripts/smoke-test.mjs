@@ -37,7 +37,7 @@ if (expectedCommit && deployedCommit !== expectedCommit) {
 }
 
 const checks = [
-  ['/', '랑이와 함께 보는'],
+  ['/', 'RANG NETWORK · THREE FIELDS'],
   ['/about/', '밤하늘을 관측하고'],
   ['/archive/', '<option value="updated">최근 수정순</option>'],
   ['/observations/', '관측 데이터 현황'],
